@@ -41,7 +41,7 @@ openssl rand -base64 32
 xK9mP2vL8nQ4wR7tY5uI3oP6aS1dF0gH2jK4lM9nB8vC=
 ```
 
-**📝 COPY THIS PASSWORD - You'll need it in Step 3!**
+**COPY THIS PASSWORD - You'll need it in Step 3!**
 
 ### Change the Password in PostgreSQL
 
@@ -376,4 +376,3 @@ Before you commit to git:
 
 ---
 
-**You're now secure and ready to commit to git!** 🎉

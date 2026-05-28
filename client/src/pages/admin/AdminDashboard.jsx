@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
+import { userManagementService } from '../../services/api/userManagementService'
 import { 
   Users, 
   FileText, 
@@ -10,12 +12,29 @@ import {
   Calendar as CalendarIcon, 
   BookOpen, 
   Building2, 
-  Info 
+  Info,
+  Loader2
 } from 'lucide-react'
 
 const AdminDashboard = () => {
   const { t } = useTranslation()
   const { user } = useAuth()
+  const [stats, setStats] = useState(null)
+  const [statsLoading, setStatsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await userManagementService.getUserStats()
+        setStats(data)
+      } catch (error) {
+        console.error('Failed to fetch dashboard stats:', error)
+      } finally {
+        setStatsLoading(false)
+      }
+    }
+    fetchStats()
+  }, [])
 
   const contentManagementLinks = [
     { to: '/admin/news', icon: Newspaper, label: t('content.news'), color: 'blue' },
@@ -46,7 +65,9 @@ const AdminDashboard = () => {
                 <Users className="w-6 h-6 text-primary-600 dark:text-primary-400" />
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">0</h3>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              {statsLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : stats?.totalUsers ?? 0}
+            </h3>
             <p className="text-gray-600 dark:text-gray-400">{t('admin.totalUsers')}</p>
           </div>
 
@@ -56,7 +77,9 @@ const AdminDashboard = () => {
                 <Users className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">0</h3>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              {statsLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : stats?.totalStudents ?? 0}
+            </h3>
             <p className="text-gray-600 dark:text-gray-400">{t('admin.totalStudents')}</p>
           </div>
 
@@ -66,7 +89,9 @@ const AdminDashboard = () => {
                 <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">0</h3>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              {statsLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : stats?.totalFaculty ?? 0}
+            </h3>
             <p className="text-gray-600 dark:text-gray-400">{t('admin.totalFaculty')}</p>
           </div>
 
@@ -76,7 +101,7 @@ const AdminDashboard = () => {
                 <FileText className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">7</h3>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{contentManagementLinks.length}</h3>
             <p className="text-gray-600 dark:text-gray-400">{t('admin.contentManagement')}</p>
           </div>
         </div>

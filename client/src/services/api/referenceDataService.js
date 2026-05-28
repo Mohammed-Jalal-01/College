@@ -11,6 +11,11 @@ export const referenceDataService = {
     return response.data;
   },
 
+  getStudyTypesForRegistration: async () => {
+    const response = await apiClient.get('/studytypes?registrationOnly=true');
+    return response.data;
+  },
+
   getStages: async () => {
     const response = await apiClient.get('/stages');
     return response.data;

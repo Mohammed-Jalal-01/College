@@ -32,7 +32,7 @@ const StudentInfoPage = () => {
       try {
         const [branchesData, studyTypesData, stagesData] = await Promise.all([
           referenceDataService.getBranches(),
-          referenceDataService.getStudyTypes(),
+          referenceDataService.getStudyTypesForRegistration(),
           referenceDataService.getStages(),
         ])
 

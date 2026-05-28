@@ -12,7 +12,7 @@ public class RateLimitingMiddleware
     private static readonly Dictionary<string, RateLimitRule> RateLimitRules = new()
     {
         { "/api/auth/login", new RateLimitRule { MaxRequests = 5, WindowMinutes = 15 } },
-        { "/api/auth/register", new RateLimitRule { MaxRequests = 3, WindowMinutes = 60 } },
+        { "/api/auth/register", new RateLimitRule { MaxRequests = 50, WindowMinutes = 60 } },
         { "/api/auth", new RateLimitRule { MaxRequests = 10, WindowMinutes = 15 } }
     };
 

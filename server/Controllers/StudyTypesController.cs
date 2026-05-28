@@ -18,11 +18,18 @@ public class StudyTypesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] bool registrationOnly = false)
     {
         try
         {
-            var studyTypes = await _context.StudyTypes
+            var query = _context.StudyTypes.AsQueryable();
+
+            if (registrationOnly)
+            {
+                query = query.Where(st => st.NameEn != "All Types");
+            }
+
+            var studyTypes = await query
                 .OrderBy(st => st.NameEn)
                 .ToListAsync();
             

@@ -155,6 +155,7 @@ const RegisterPage = () => {
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   name="password"
+                  dir="ltr"
                   value={formData.password}
                   onChange={handleChange}
                   className={`w-full px-4 py-3 rounded-lg border ${
@@ -183,6 +184,7 @@ const RegisterPage = () => {
                   type={showConfirmPassword ? 'text' : 'password'}
                   id="confirmPassword"
                   name="confirmPassword"
+                  dir="ltr"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className={`w-full px-4 py-3 rounded-lg border ${

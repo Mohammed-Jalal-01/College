@@ -117,6 +117,7 @@ const LoginPage = () => {
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   name="password"
+                  dir="ltr"
                   value={formData.password}
                   onChange={handleChange}
                   className={`w-full px-4 py-3 rounded-lg border ${

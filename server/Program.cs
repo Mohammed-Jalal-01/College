@@ -80,12 +80,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseSerilogRequestLogging();
 
+app.UseCors("AllowFrontend");
+
 app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseMiddleware<RateLimitingMiddleware>();
 
 app.UseStaticFiles();
-
-app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
