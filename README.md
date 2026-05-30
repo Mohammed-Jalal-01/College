@@ -31,6 +31,7 @@ The College Management System is a full-stack web application designed to stream
 - **Role-Based Access Control**: Three-tier permission system (SuperAdmin, Admin, Regular)
 - **Content Management**: Dynamic management of news, updates, activities, and departments
 - **Academic Resources**: Lecture schedules and course materials with advanced filtering
+- **Grades Management**: Faculty can upload grade files per subject; students view grades via subject tabs
 - **Bilingual Support**: Complete Arabic (RTL) and English language support
 - **Theme System**: Light and dark mode with persistent preferences
 - **File Management**: Secure file upload and storage for course materials
@@ -79,6 +80,7 @@ The College Management System is a full-stack web application designed to stream
 - Professional profile
 - Can be promoted to Admin role
 - Access to all academic resources
+- Upload and manage student grade files (per subject, branch, stage, study type)
 
 ## Technology Stack
 
@@ -487,7 +489,7 @@ The application implements the following security headers:
 ### File Upload Security
 
 - **Size Limit**: 50MB maximum
-- **Allowed Extensions**: .pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx, .zip, .rar
+- **Allowed Extensions**: .pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx, .csv, .ods, .txt, .png, .jpg, .jpeg, .zip, .rar
 - **Content Validation**: Magic byte verification
 - **Filename Sanitization**: Removes dangerous characters
 - **Unique Filenames**: GUID-based naming to prevent overwrites
@@ -562,6 +564,7 @@ http://localhost:5000/swagger
 **Departments**: `/api/departments`
 **Lecture Schedules**: `/api/lectureschedules`
 **Course Materials**: `/api/coursematerials`
+**Grades**: `/api/grades`
 **About College**: `/api/aboutcollege`
 
 Each content endpoint supports:
@@ -569,6 +572,10 @@ Each content endpoint supports:
 - POST (create - admin only)
 - PUT (update - admin only)
 - DELETE (delete - admin only)
+
+**Note**: The Grades endpoint has different authorization rules:
+- GET requires authentication (any logged-in user)
+- POST/PUT/DELETE requires Faculty user type or Admin/SuperAdmin role
 
 For detailed API documentation, see [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)
 
@@ -772,5 +779,5 @@ This project is proprietary and confidential. All rights reserved.
 ---
 
 **Version**: 1.0.0  
-**Last Updated**: February 2026  
+**Last Updated**: May 2026  
 **Maintained By**: Mohammed Jalal

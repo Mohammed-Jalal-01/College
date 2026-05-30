@@ -6,6 +6,7 @@
     "departments": "الأقسام والوحدات",
     "schedules": "الجداول الدراسية",
     "materials": "المواد الدراسية",
+    "grades": "الدرجات",
     "login": "تسجيل الدخول",
     "register": "التسجيل",
     "logout": "تسجيل الخروج",
@@ -50,7 +51,13 @@
     "firstCourse": "الكورس الأول",
     "secondCourse": "الكورس الثاني",
     "apply": "تطبيق",
-    "reset": "إعادة تعيين"
+    "reset": "إعادة تعيين",
+    "branch": "التخصص",
+    "studyType": "نوع الدراسة",
+    "stage": "المرحلة",
+    "selectBranch": "اختر التخصص",
+    "selectStudyType": "اختر نوع الدراسة",
+    "selectStage": "اختر المرحلة"
   },
   "common": {
     "loading": "جاري التحميل...",
@@ -155,6 +162,22 @@
     "fileTooLarge": "حجم الملف يجب ألا يتجاوز 50 ميجابايت",
     "allowedTypes": "أنواع الملفات المسموحة",
     "noMaterials": "لا توجد مواد دراسية"
+  },
+  "grades": {
+    "addGrade": "اضافة درجات",
+    "editGrade": "تعديل الدرجات",
+    "subjectName": "اسم المادة",
+    "subjectRequired": "اسم المادة مطلوب",
+    "allFieldsRequired": "جميع الحقول مطلوبة",
+    "fileRequired": "الملف مطلوب",
+    "file": "الملف",
+    "leaveEmptyToKeep": "اتركه فارغا للاحتفاظ بالملف الحالي",
+    "allowedTypes": "انواع الملفات المسموحة",
+    "noGrades": "لا توجد درجات متاحة",
+    "confirmDelete": "هل انت متاكد من حذف هذه الدرجات؟",
+    "uploadedBy": "رفع بواسطة",
+    "fileName": "اسم الملف",
+    "fileType": "نوع الملف"
   },
   "admin": {
     "dashboard": "لوحة التحكم",

@@ -31,7 +31,8 @@ client/src/
 │   │   ├── ActivitiesPage.jsx
 │   │   ├── DepartmentsPage.jsx
 │   │   ├── SchedulesPage.jsx
-│   │   └── MaterialsPage.jsx
+│   │   ├── MaterialsPage.jsx
+│   │   └── GradesPage.jsx
 │   ├── admin/           # Admin dashboard pages
 │   │   ├── AdminDashboard.jsx
 │   │   ├── NewsManagement.jsx
@@ -258,6 +259,7 @@ export const ThemeProvider = ({ children }) => {
     <Route path="/departments" element={<DepartmentsPage />} />
     <Route path="/schedules" element={<SchedulesPage />} />
     <Route path="/materials" element={<MaterialsPage />} />
+    <Route path="/grades" element={<ProtectedRoute><GradesPage /></ProtectedRoute>} />
     
     {/* Auth Routes */}
     <Route path="/login" element={<LoginPage />} />

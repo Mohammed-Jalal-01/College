@@ -7,6 +7,7 @@ import ActivitiesPage from './pages/public/ActivitiesPage'
 import DepartmentsPage from './pages/public/DepartmentsPage'
 import SchedulesPage from './pages/public/SchedulesPage'
 import MaterialsPage from './pages/public/MaterialsPage'
+import GradesPage from './pages/public/GradesPage'
 import UserProfilePage from './pages/public/UserProfilePage'
 import AccountTypeSelection from './pages/auth/AccountTypeSelection'
 import RegisterPage from './pages/auth/RegisterPage'
@@ -47,6 +48,14 @@ function App() {
           <Route path="departments" element={<DepartmentsPage />} />
           <Route path="schedules" element={<SchedulesPage />} />
           <Route path="materials" element={<MaterialsPage />} />
+          <Route 
+            path="grades" 
+            element={
+              <ProtectedRoute>
+                <GradesPage />
+              </ProtectedRoute>
+            } 
+          />
           <Route 
             path="user/:displayId" 
             element={

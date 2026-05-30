@@ -2,7 +2,7 @@
 
 ## Overview
 
-The College Management System provides comprehensive content management capabilities for News, Updates, Activities, Departments, Lecture Schedules, Course Materials, and About College content. All content management operations require Admin or SuperAdmin privileges.
+The College Management System provides comprehensive content management capabilities for News, Updates, Activities, Departments, Lecture Schedules, Course Materials, Grades, and About College content. Most content management operations require Admin or SuperAdmin privileges. Grades have special authorization allowing Faculty users to manage their own grade uploads.
 
 ## Technical Stack
 
@@ -47,6 +47,14 @@ The College Management System provides comprehensive content management capabili
 - File upload (PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, ZIP, RAR)
 - File size and name tracking
 - Optional filtering by Branch, StudyType, Stage
+
+### Grades
+- Faculty users can upload grade files per subject
+- File upload (PDF, DOC, DOCX, XLS, XLSX, CSV, ODS, PPT, PPTX, PNG, JPG, TXT, ZIP, RAR)
+- Subject name, branch, stage, and study type metadata
+- Students view grades via subject-named tabs
+- Authorization: Faculty user type or Admin/SuperAdmin role for create/update/delete
+- Any authenticated user can view grades
 
 ### About College
 - Bilingual content
@@ -463,6 +471,7 @@ public class CourseMaterial
 - Departments: `server/Controllers/DepartmentsController.cs`
 - Lecture Schedules: `server/Controllers/LectureSchedulesController.cs`
 - Course Materials: `server/Controllers/CourseMaterialsController.cs`
+- Grades: `server/Controllers/GradesController.cs`
 - About College: `server/Controllers/AboutCollegeController.cs`
 
 **Frontend Pages:**
@@ -474,6 +483,7 @@ public class CourseMaterial
 - Schedules Management: `client/src/pages/admin/SchedulesManagement.jsx`
 - Materials Management: `client/src/pages/admin/MaterialsManagement.jsx`
 - About College Management: `client/src/pages/admin/AboutCollegeManagement.jsx`
+- Grades Page: `client/src/pages/public/GradesPage.jsx`
 
 ## Testing Considerations
 

@@ -728,6 +728,93 @@ Delete course material and associated file (Admin/SuperAdmin).
 
 ---
 
+## Grades Endpoints
+
+### GET /api/grades
+
+Get all grades with optional filtering.
+
+**Authentication:** Required (any authenticated user)
+
+**Query Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| branchId | Guid (optional) | Filter by branch |
+| studyTypeId | Guid (optional) | Filter by study type |
+| stageId | Guid (optional) | Filter by stage |
+
+**Response (200):**
+```json
+[
+  {
+    "id": "guid",
+    "subjectName": "Data Structures",
+    "branchId": "guid",
+    "branchNameEn": "Software Engineering",
+    "branchNameAr": "هندسة البرمجيات",
+    "studyTypeId": "guid",
+    "studyTypeNameEn": "Morning",
+    "studyTypeNameAr": "صباحي",
+    "stageId": "guid",
+    "stageNameEn": "Second Stage",
+    "stageNameAr": "مرحلة ثانية",
+    "stageNumber": 2,
+    "fileUrl": "/uploads/grades/filename.xlsx",
+    "fileType": "xlsx",
+    "originalFileName": "grades_2026.xlsx",
+    "uploadedBy": "guid",
+    "uploadedByName": "Dr. Name",
+    "createdAt": "2026-01-01T00:00:00Z",
+    "updatedAt": "2026-01-01T00:00:00Z"
+  }
+]
+```
+
+### GET /api/grades/{id}
+
+Get a single grade by ID.
+
+**Authentication:** Required (any authenticated user)
+
+### POST /api/grades
+
+Upload a new grade file.
+
+**Authentication:** Required (Faculty user type OR Admin/SuperAdmin role)
+
+**Content-Type:** multipart/form-data
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| subjectName | string | Yes | Subject name (max 200 chars) |
+| branchId | Guid | Yes | Branch identifier |
+| studyTypeId | Guid | Yes | Study type identifier |
+| stageId | Guid | Yes | Stage identifier |
+| file | File | Yes | Grade file (max 50MB) |
+
+**Allowed File Types:** pdf, doc, docx, xls, xlsx, csv, ods, ppt, pptx, png, jpg, jpeg, txt, zip, rar
+
+**Response (201):** Created grade object
+
+### PUT /api/grades/{id}
+
+Update an existing grade entry.
+
+**Authentication:** Required (owner Faculty or Admin/SuperAdmin)
+
+**Content-Type:** multipart/form-data
+
+**Request Body:** Same as POST, but file is optional (keeps existing file if not provided)
+
+### DELETE /api/grades/{id}
+
+Delete a grade and its associated file.
+
+**Authentication:** Required (owner Faculty or Admin/SuperAdmin)
+
+---
+
 ## About College Endpoints
 
 ### GET /api/aboutcollege
@@ -848,6 +935,7 @@ Rate limits are per IP address. Exceeding limits returns 429 status.
 - Departments: `server/Controllers/DepartmentsController.cs`
 - Lecture Schedules: `server/Controllers/LectureSchedulesController.cs`
 - Course Materials: `server/Controllers/CourseMaterialsController.cs`
+- Grades: `server/Controllers/GradesController.cs`
 - About College: `server/Controllers/AboutCollegeController.cs`
 - Branches: `server/Controllers/BranchesController.cs`
 - Study Types: `server/Controllers/StudyTypesController.cs`

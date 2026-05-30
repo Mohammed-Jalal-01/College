@@ -374,7 +374,8 @@ if (file.Length > MaxFileSize)
 ```csharp
 // server/Services/FileStorageService.cs:47-51
 var allowedExtensions = new[] { 
-    ".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".zip", ".rar" 
+    ".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", 
+    ".csv", ".ods", ".txt", ".png", ".jpg", ".jpeg", ".zip", ".rar" 
 };
 if (!allowedExtensions.Contains(extension))
 {

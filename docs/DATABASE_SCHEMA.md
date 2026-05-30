@@ -32,6 +32,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Department> Departments { get; set; }
     public DbSet<LectureSchedule> LectureSchedules { get; set; }
     public DbSet<CourseMaterial> CourseMaterials { get; set; }
+    public DbSet<Grade> Grades { get; set; }
     public DbSet<AboutCollege> AboutCollege { get; set; }
     public DbSet<AuditLog> AuditLogs { get; set; }
 }
@@ -163,6 +164,24 @@ CourseMaterial (Academic Entity)
 ├── StageId: Guid (FK → Stage.Id, Nullable)
 ├── UploadedAt: DateTime
 └── CreatedAt: DateTime
+
+Grade (Academic Entity)
+├── Id: Guid (PK)
+├── SubjectName: string(200)
+├── BranchId: Guid (FK → Branch.Id)
+├── StudyTypeId: Guid (FK → StudyType.Id)
+├── StageId: Guid (FK → Stage.Id)
+├── FileUrl: string(500)
+├── FileType: string(50)
+├── OriginalFileName: string(255)
+├── UploadedBy: Guid (FK → User.Id)
+├── CreatedAt: DateTime
+├── UpdatedAt: DateTime
+└── Relationships:
+    ├── BelongsTo: Branch (N:1)
+    ├── BelongsTo: StudyType (N:1)
+    ├── BelongsTo: Stage (N:1)
+    └── BelongsTo: User (N:1, UploadedByUser)
 
 AboutCollege (Content Entity)
 ├── Id: Guid (PK)

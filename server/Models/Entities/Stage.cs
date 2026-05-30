@@ -21,4 +21,5 @@ public class Stage
     public ICollection<Student> Students { get; set; } = new List<Student>();
     public ICollection<LectureSchedule> LectureSchedules { get; set; } = new List<LectureSchedule>();
     public ICollection<CourseMaterial> CourseMaterials { get; set; } = new List<CourseMaterial>();
+    public ICollection<Grade> Grades { get; set; } = new List<Grade>();
 }
