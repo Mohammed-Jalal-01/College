@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Users, Shield, ShieldAlert, ArrowUpCircle, ArrowDownCircle, RefreshCw, X } from 'lucide-react';
+import { Users, GraduationCap, BookOpen, Shield, ShieldAlert, ArrowUpCircle, ArrowDownCircle, RefreshCw, X } from 'lucide-react';
 import { userManagementService } from '../../services/api/userManagementService';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -139,69 +139,39 @@ const UserManagement = () => {
       </div>
 
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('userManagement.totalUsers')}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalUsers}</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {[
+            { label: t('userManagement.totalUsers'), value: stats.totalUsers, icon: Users, bg: 'bg-primary-50 dark:bg-primary-900/30', color: 'text-primary-600 dark:text-primary-400' },
+            { label: t('userManagement.totalStudents'), value: stats.totalStudents, icon: GraduationCap, bg: 'bg-green-50 dark:bg-green-900/30', color: 'text-green-600 dark:text-green-400' },
+            { label: t('userManagement.totalFaculty'), value: stats.totalFaculty, icon: BookOpen, bg: 'bg-purple-50 dark:bg-purple-900/30', color: 'text-purple-600 dark:text-purple-400' },
+            { label: t('userManagement.totalAdmins'), value: stats.totalAdmins, icon: Shield, bg: 'bg-amber-50 dark:bg-amber-900/30', color: 'text-amber-600 dark:text-amber-400' },
+            { label: t('userManagement.totalSuperAdmins'), value: stats.totalSuperAdmins, icon: ShieldAlert, bg: 'bg-red-50 dark:bg-red-900/30', color: 'text-red-600 dark:text-red-400' },
+          ].map((card, idx) => (
+            <div key={idx} className="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 ${card.bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                  <card.icon className={`w-5 h-5 ${card.color}`} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xl font-bold text-gray-900 dark:text-white leading-tight">{card.value}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{card.label}</p>
+                </div>
               </div>
-              <Users className="w-8 h-8 text-primary-600" />
             </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('userManagement.totalStudents')}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalStudents}</p>
-              </div>
-              <Users className="w-8 h-8 text-green-600" />
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('userManagement.totalFaculty')}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalFaculty}</p>
-              </div>
-              <Users className="w-8 h-8 text-purple-600" />
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('userManagement.totalAdmins')}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalAdmins}</p>
-              </div>
-              <Shield className="w-8 h-8 text-blue-600" />
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('userManagement.totalSuperAdmins')}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalSuperAdmins}</p>
-              </div>
-              <ShieldAlert className="w-8 h-8 text-red-600" />
-            </div>
-          </div>
+          ))}
         </div>
       )}
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-        <div className="flex flex-wrap gap-4 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+        <div className="flex flex-wrap items-end gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
               {t('userManagement.filterByRole')}
             </label>
             <select
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none"
             >
               <option value="All">{t('filters.all')}</option>
               <option value="SuperAdmin">{t('roles.superAdmin')}</option>
@@ -209,15 +179,14 @@ const UserManagement = () => {
               <option value="Regular">{t('roles.regular')}</option>
             </select>
           </div>
-
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
               {t('userManagement.filterByType')}
             </label>
             <select
               value={filterUserType}
               onChange={(e) => setFilterUserType(e.target.value)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none"
             >
               <option value="All">{t('filters.all')}</option>
               <option value="Student">{t('common.student')}</option>
@@ -227,89 +196,91 @@ const UserManagement = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+          <table className="min-w-full">
+            <thead>
+              <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-700/50">
+                <th className="px-4 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('userManagement.displayId')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('userManagement.name')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('userManagement.email')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('userManagement.type')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('userManagement.role')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('userManagement.info')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('common.actions')}
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
               {filteredUsers.map((user) => (
-                <tr key={user.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900 dark:text-white">
+                <tr key={user.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900 dark:text-white">
                     {user.displayId}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     {user.profileName}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {user.email}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getUserTypeBadge(user.userType)}`}>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getUserTypeBadge(user.userType)}`}>
                       {user.userType}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getRoleBadge(user.role)}`}>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadge(user.role)}`}>
                       {user.role}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                  <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
                     {user.studentInfo && (
-                      <div className="text-xs">
+                      <div className="space-y-0.5">
                         <div>{i18n.language === 'ar' ? user.studentInfo.branchNameAr : user.studentInfo.branchNameEn}</div>
                         <div>{i18n.language === 'ar' ? user.studentInfo.stageNameAr : user.studentInfo.stageNameEn}</div>
                       </div>
                     )}
                     {user.facultyInfo && user.facultyInfo.department && (
-                      <div className="text-xs">{user.facultyInfo.department}</div>
+                      <div>{user.facultyInfo.department}</div>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    {user.userType === 'Faculty' && user.role === 'Regular' && (
-                      <button
-                        onClick={() => handlePromoteToAdmin(user.id)}
-                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 mr-2"
-                        title={t('userManagement.promoteToAdmin')}
-                      >
-                        <ArrowUpCircle className="w-5 h-5" />
-                      </button>
-                    )}
-                    {user.role === 'Admin' && (
-                      <button
-                        onClick={() => handleDemoteToRegular(user.id)}
-                        className="text-orange-600 hover:text-orange-900 dark:text-orange-400"
-                        title={t('userManagement.demoteToRegular')}
-                      >
-                        <ArrowDownCircle className="w-5 h-5" />
-                      </button>
-                    )}
-                    {user.role === 'SuperAdmin' && (
-                      <span className="text-gray-400 text-xs">{t('userManagement.superAdminRole')}</span>
-                    )}
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className="flex items-center gap-1">
+                      {user.userType === 'Faculty' && user.role === 'Regular' && (
+                        <button
+                          onClick={() => handlePromoteToAdmin(user.id)}
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                          title={t('userManagement.promoteToAdmin')}
+                        >
+                          <ArrowUpCircle className="w-4 h-4" />
+                        </button>
+                      )}
+                      {user.role === 'Admin' && (
+                        <button
+                          onClick={() => handleDemoteToRegular(user.id)}
+                          className="p-1.5 text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/30 rounded-lg transition-colors"
+                          title={t('userManagement.demoteToRegular')}
+                        >
+                          <ArrowDownCircle className="w-4 h-4" />
+                        </button>
+                      )}
+                      {user.role === 'SuperAdmin' && (
+                        <span className="text-xs text-gray-400">{t('userManagement.superAdminRole')}</span>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

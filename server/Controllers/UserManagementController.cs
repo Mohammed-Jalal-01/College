@@ -9,7 +9,7 @@ namespace CollegeAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Policy = "SuperAdminOnly")]
+[Authorize]
 public class UserManagementController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
@@ -22,6 +22,7 @@ public class UserManagementController : ControllerBase
     }
 
     [HttpGet("users")]
+    [Authorize(Policy = "SuperAdminOnly")]
     public async Task<IActionResult> GetAllUsers()
     {
         try
@@ -73,6 +74,7 @@ public class UserManagementController : ControllerBase
     }
 
     [HttpGet("stats")]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> GetUserStats()
     {
         try
@@ -102,6 +104,7 @@ public class UserManagementController : ControllerBase
     }
 
     [HttpPost("promote-to-admin")]
+    [Authorize(Policy = "SuperAdminOnly")]
     public async Task<IActionResult> PromoteToAdmin([FromBody] PromoteToAdminDto dto)
     {
         try
@@ -139,6 +142,7 @@ public class UserManagementController : ControllerBase
     }
 
     [HttpPost("demote-to-regular")]
+    [Authorize(Policy = "SuperAdminOnly")]
     public async Task<IActionResult> DemoteToRegular([FromBody] DemoteToRegularDto dto)
     {
         try
@@ -176,6 +180,7 @@ public class UserManagementController : ControllerBase
     }
 
     [HttpPost("transfer-superadmin")]
+    [Authorize(Policy = "SuperAdminOnly")]
     public async Task<IActionResult> TransferSuperAdmin([FromBody] TransferSuperAdminDto dto)
     {
         try
@@ -237,6 +242,7 @@ public class UserManagementController : ControllerBase
     }
 
     [HttpGet("faculty-users")]
+    [Authorize(Policy = "SuperAdminOnly")]
     public async Task<IActionResult> GetFacultyUsers()
     {
         try

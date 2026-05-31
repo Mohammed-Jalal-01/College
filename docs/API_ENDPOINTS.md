@@ -266,7 +266,7 @@ Get all users with detailed information.
 
 Get user statistics.
 
-**Authentication:** Required (SuperAdmin)
+**Authentication:** Required (Admin or SuperAdmin)
 
 **Response:** 200 OK
 ```json

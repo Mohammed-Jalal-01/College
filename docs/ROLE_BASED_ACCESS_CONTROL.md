@@ -109,15 +109,28 @@ builder.Services.AddAuthorization(options =>
 public class NewsController : ControllerBase
 ```
 
-**SuperAdminOnly Policy Example:**
+**SuperAdminOnly Policy Example (per-method):**
 
 ```csharp
-// server/Controllers/UserManagementController.cs:10-13
+// server/Controllers/UserManagementController.cs
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Policy = "SuperAdminOnly")]
+[Authorize]
 public class UserManagementController : ControllerBase
+{
+    [HttpGet("users")]
+    [Authorize(Policy = "SuperAdminOnly")]
+    public async Task<IActionResult> GetAllUsers() { ... }
+
+    [HttpGet("stats")]
+    [Authorize(Policy = "AdminOnly")]
+    public async Task<IActionResult> GetUserStats() { ... }
+}
 ```
+
+The UserManagementController uses per-method authorization. Most endpoints
+require SuperAdminOnly, but the stats endpoint uses AdminOnly so that both
+Admin and SuperAdmin users can view dashboard statistics.
 
 **Public Endpoint (No Authorization):**
 
@@ -450,7 +463,7 @@ Role = "Regular"  // All new users start as Regular
 
 ### GET /api/usermanagement/stats
 
-**Authorization:** SuperAdminOnly
+**Authorization:** AdminOnly
 
 **Response:**
 ```json

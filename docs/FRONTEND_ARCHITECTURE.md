@@ -36,7 +36,6 @@ client/src/
 │   ├── admin/           # Admin dashboard pages
 │   │   ├── AdminDashboard.jsx
 │   │   ├── NewsManagement.jsx
-│   │   ├── UpdatesManagement.jsx
 │   │   ├── ActivitiesManagement.jsx
 │   │   ├── DepartmentsManagement.jsx
 │   │   ├── SchedulesManagement.jsx
