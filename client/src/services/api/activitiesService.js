@@ -11,13 +11,17 @@ export const activitiesService = {
     return response.data;
   },
 
-  create: async (data) => {
-    const response = await apiClient.post('/activities', data);
+  create: async (formData) => {
+    const response = await apiClient.post('/activities', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   },
 
-  update: async (id, data) => {
-    const response = await apiClient.put(`/activities/${id}`, data);
+  update: async (id, formData) => {
+    const response = await apiClient.put(`/activities/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   },
 

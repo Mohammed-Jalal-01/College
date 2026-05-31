@@ -19,7 +19,9 @@ public class FileStorageService : IFileStorageService
         { ".rar", new List<byte[]> { new byte[] { 0x52, 0x61, 0x72, 0x21, 0x1A, 0x07 } } },
         { ".png", new List<byte[]> { new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A } } },
         { ".jpg", new List<byte[]> { new byte[] { 0xFF, 0xD8, 0xFF } } },
-        { ".jpeg", new List<byte[]> { new byte[] { 0xFF, 0xD8, 0xFF } } }
+        { ".jpeg", new List<byte[]> { new byte[] { 0xFF, 0xD8, 0xFF } } },
+        { ".gif", new List<byte[]> { new byte[] { 0x47, 0x49, 0x46, 0x38 } } },
+        { ".webp", new List<byte[]> { new byte[] { 0x52, 0x49, 0x46, 0x46 } } }
     };
 
     public FileStorageService(IWebHostEnvironment environment, ILogger<FileStorageService> logger)
@@ -49,7 +51,7 @@ public class FileStorageService : IFileStorageService
                 throw new ArgumentException("File must have an extension");
             }
 
-            var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".csv", ".ods", ".txt", ".png", ".jpg", ".jpeg", ".zip", ".rar" };
+            var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".csv", ".ods", ".txt", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".zip", ".rar" };
             if (!allowedExtensions.Contains(extension))
             {
                 throw new ArgumentException($"File type {extension} is not allowed");

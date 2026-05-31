@@ -24,6 +24,9 @@ public class News
 
     public bool IsFeatured { get; set; } = false;
 
+    [MaxLength(500)]
+    public string? ImageUrl { get; set; }
+
     [ForeignKey("CreatedByUser")]
     public Guid CreatedBy { get; set; }
 

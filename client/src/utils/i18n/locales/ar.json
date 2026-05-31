@@ -41,7 +41,6 @@
   },
   "home": {
     "featuredNews": "الأخبار المميزة",
-    "latestUpdates": "آخر التحديثات",
     "welcome": "مرحباً بكم في كلية علوم الحاسوب"
   },
   "filters": {
@@ -83,7 +82,6 @@
   },
   "content": {
     "news": "الأخبار",
-    "updates": "التحديثات",
     "activities": "الأنشطة",
     "departments": "الأقسام",
     "aboutCollege": "عن الكلية",
@@ -145,7 +143,10 @@
     "friday": "الجمعة",
     "saturday": "السبت",
     "sunday": "الأحد",
-    "noSchedules": "لا توجد جداول"
+    "noSchedules": "لا توجد جداول",
+    "allFieldsRequired": "جميع الحقول مطلوبة",
+    "addSchedule": "إضافة جدول",
+    "editSchedule": "تعديل جدول"
   },
   "materials": {
     "title": "العنوان",
@@ -161,7 +162,10 @@
     "fileRequired": "الملف مطلوب",
     "fileTooLarge": "حجم الملف يجب ألا يتجاوز 50 ميجابايت",
     "allowedTypes": "أنواع الملفات المسموحة",
-    "noMaterials": "لا توجد مواد دراسية"
+    "noMaterials": "لا توجد مواد دراسية",
+    "titleRequired": "العنوان مطلوب باللغتين",
+    "allFieldsRequired": "جميع الحقول مطلوبة",
+    "leaveEmptyToKeep": "اتركه فارغا للاحتفاظ بالملف الحالي"
   },
   "grades": {
     "addGrade": "اضافة درجات",
@@ -178,6 +182,11 @@
     "uploadedBy": "رفع بواسطة",
     "fileName": "اسم الملف",
     "fileType": "نوع الملف"
+  },
+  "about": {
+    "writeContent": "كتابة محتوى",
+    "uploadImage": "رفع صورة",
+    "imageOptional": "الصورة اختيارية"
   },
   "admin": {
     "dashboard": "لوحة التحكم",
@@ -197,14 +206,15 @@
     "confirmDelete": "هل أنت متأكد من حذف هذا العنصر؟",
     "actions": "الإجراءات",
     "create": "إنشاء",
-    "update": "تحديث"
+    "update": "تحديث",
+    "userManagementDesc": "إدارة أدوار المستخدمين وترقية أعضاء هيئة التدريس ونقل صلاحيات عميد الكلية."
   },
   "userManagement": {
     "totalUsers": "إجمالي المستخدمين",
     "totalStudents": "إجمالي الطلاب",
     "totalFaculty": "إجمالي أعضاء هيئة التدريس",
     "totalAdmins": "إجمالي المدراء",
-    "totalSuperAdmins": "المدراء العامون",
+    "totalSuperAdmins": "عميد الكلية",
     "displayId": "رقم الحساب",
     "name": "الاسم",
     "email": "البريد الإلكتروني",
@@ -213,23 +223,23 @@
     "info": "المعلومات",
     "promoteToAdmin": "ترقية إلى مدير",
     "demoteToRegular": "تخفيض إلى عادي",
-    "transferSuperAdmin": "نقل صلاحيات المدير العام",
+    "transferSuperAdmin": "نقل صلاحيات عميد الكلية",
     "confirmPromote": "هل أنت متأكد من ترقية هذا المستخدم إلى مدير؟",
     "confirmDemote": "هل أنت متأكد من تخفيض هذا المستخدم إلى عادي؟",
-    "confirmTransfer": "هل أنت متأكد من نقل صلاحيات المدير العام؟ ستصبح مديراً عادياً.",
+    "confirmTransfer": "هل أنت متأكد من نقل صلاحيات عميد الكلية؟ ستصبح مديراً عادياً.",
     "promoteSuccess": "تمت ترقية المستخدم إلى مدير بنجاح",
     "demoteSuccess": "تم تخفيض المستخدم إلى عادي بنجاح",
-    "transferSuccess": "تم نقل صلاحيات المدير العام بنجاح. سيتم تسجيل خروجك.",
+    "transferSuccess": "تم نقل صلاحيات عميد الكلية بنجاح. سيتم تسجيل خروجك.",
     "selectFaculty": "اختر عضو هيئة تدريس",
-    "selectNewSuperAdmin": "اختر المدير العام الجديد",
-    "transferWarning": "تحذير: ستفقد صلاحيات المدير العام وتصبح مديراً عادياً. لا يمكن التراجع عن هذا الإجراء.",
+    "selectNewSuperAdmin": "اختر عميد الكلية الجديد",
+    "transferWarning": "تحذير: ستفقد صلاحيات عميد الكلية وتصبح مديراً عادياً. لا يمكن التراجع عن هذا الإجراء.",
     "transfer": "نقل",
-    "superAdminRole": "مدير عام",
+    "superAdminRole": "عميد الكلية",
     "filterByRole": "تصفية حسب الدور",
     "filterByType": "تصفية حسب النوع"
   },
   "roles": {
-    "superAdmin": "مدير عام",
+    "superAdmin": "عميد الكلية",
     "admin": "مدير",
     "regular": "عادي"
   }

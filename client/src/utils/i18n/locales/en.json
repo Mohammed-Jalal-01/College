@@ -41,7 +41,6 @@
   },
   "home": {
     "featuredNews": "Featured News",
-    "latestUpdates": "Latest Updates",
     "welcome": "Welcome to Computer Science College"
   },
   "filters": {
@@ -83,7 +82,6 @@
   },
   "content": {
     "news": "News",
-    "updates": "Updates",
     "activities": "Activities",
     "departments": "Departments",
     "aboutCollege": "About College",
@@ -145,7 +143,10 @@
     "friday": "Friday",
     "saturday": "Saturday",
     "sunday": "Sunday",
-    "noSchedules": "No schedules found"
+    "noSchedules": "No schedules found",
+    "allFieldsRequired": "All fields are required",
+    "addSchedule": "Add Schedule",
+    "editSchedule": "Edit Schedule"
   },
   "materials": {
     "title": "Title",
@@ -161,7 +162,10 @@
     "fileRequired": "File is required",
     "fileTooLarge": "File size must not exceed 50MB",
     "allowedTypes": "Allowed file types",
-    "noMaterials": "No materials found"
+    "noMaterials": "No materials found",
+    "titleRequired": "Title is required in both languages",
+    "allFieldsRequired": "All fields are required",
+    "leaveEmptyToKeep": "leave empty to keep current file"
   },
   "grades": {
     "addGrade": "Add Grade",
@@ -178,6 +182,11 @@
     "uploadedBy": "Uploaded By",
     "fileName": "File Name",
     "fileType": "File Type"
+  },
+  "about": {
+    "writeContent": "Write Content",
+    "uploadImage": "Upload Image",
+    "imageOptional": "Image is optional"
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -197,14 +206,15 @@
     "confirmDelete": "Are you sure you want to delete this item?",
     "actions": "Actions",
     "create": "Create",
-    "update": "Update"
+    "update": "Update",
+    "userManagementDesc": "Manage user roles, promote faculty to admin, and transfer college dean privileges."
   },
   "userManagement": {
     "totalUsers": "Total Users",
     "totalStudents": "Total Students",
     "totalFaculty": "Total Faculty",
     "totalAdmins": "Total Admins",
-    "totalSuperAdmins": "Super Admins",
+    "totalSuperAdmins": "College Dean",
     "displayId": "Account ID",
     "name": "Name",
     "email": "Email",
@@ -213,23 +223,23 @@
     "info": "Information",
     "promoteToAdmin": "Promote to Admin",
     "demoteToRegular": "Demote to Regular",
-    "transferSuperAdmin": "Transfer Super Admin",
+    "transferSuperAdmin": "Transfer College Dean",
     "confirmPromote": "Are you sure you want to promote this user to Admin?",
     "confirmDemote": "Are you sure you want to demote this user to Regular?",
-    "confirmTransfer": "Are you sure you want to transfer Super Admin role? You will become a regular Admin.",
+    "confirmTransfer": "Are you sure you want to transfer College Dean role? You will become a regular Admin.",
     "promoteSuccess": "User promoted to Admin successfully",
     "demoteSuccess": "User demoted to Regular successfully",
-    "transferSuccess": "Super Admin role transferred successfully. You will be logged out.",
+    "transferSuccess": "College Dean role transferred successfully. You will be logged out.",
     "selectFaculty": "Select a faculty member",
-    "selectNewSuperAdmin": "Select New Super Admin",
-    "transferWarning": "Warning: You will lose Super Admin privileges and become a regular Admin. This action cannot be undone.",
+    "selectNewSuperAdmin": "Select New College Dean",
+    "transferWarning": "Warning: You will lose College Dean privileges and become a regular Admin. This action cannot be undone.",
     "transfer": "Transfer",
-    "superAdminRole": "Super Admin",
+    "superAdminRole": "College Dean",
     "filterByRole": "Filter by Role",
     "filterByType": "Filter by Type"
   },
   "roles": {
-    "superAdmin": "Super Admin",
+    "superAdmin": "College Dean",
     "admin": "Admin",
     "regular": "Regular"
   }

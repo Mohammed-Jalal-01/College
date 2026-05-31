@@ -15,7 +15,6 @@ import LoginPage from './pages/auth/LoginPage'
 import StudentInfoPage from './pages/auth/StudentInfoPage'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import NewsManagement from './pages/admin/NewsManagement'
-import UpdatesManagement from './pages/admin/UpdatesManagement'
 import ActivitiesManagement from './pages/admin/ActivitiesManagement'
 import DepartmentsManagement from './pages/admin/DepartmentsManagement'
 import AboutCollegeManagement from './pages/admin/AboutCollegeManagement'
@@ -92,14 +91,6 @@ function App() {
             } 
           />
           <Route 
-            path="updates" 
-            element={
-              <ProtectedRoute requireAdmin>
-                <UpdatesManagement />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
             path="activities" 
             element={
               <ProtectedRoute requireAdmin>
@@ -142,7 +133,7 @@ function App() {
           <Route 
             path="users" 
             element={
-              <ProtectedRoute requireAdmin>
+              <ProtectedRoute requireSuperAdmin>
                 <UserManagement />
               </ProtectedRoute>
             } 

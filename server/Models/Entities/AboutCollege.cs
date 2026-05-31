@@ -14,8 +14,13 @@ public class AboutCollege
     [Required]
     public string ContentAr { get; set; } = string.Empty;
 
+    [MaxLength(500)]
+    public string? ImageUrl { get; set; }
+
     [ForeignKey("UpdatedByUser")]
     public Guid UpdatedBy { get; set; }
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

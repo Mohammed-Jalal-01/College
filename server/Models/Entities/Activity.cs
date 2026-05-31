@@ -24,6 +24,9 @@ public class Activity
 
     public DateTime Date { get; set; }
 
+    [MaxLength(500)]
+    public string? ImageUrl { get; set; }
+
     [ForeignKey("CreatedByUser")]
     public Guid CreatedBy { get; set; }
 

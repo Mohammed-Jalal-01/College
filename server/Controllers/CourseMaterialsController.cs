@@ -153,11 +153,16 @@ public class CourseMaterialsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize]
     public async Task<IActionResult> Create([FromForm] CreateCourseMaterialDto createDto)
     {
         try
         {
+            if (!IsFacultyOrAdmin())
+            {
+                return Forbid();
+            }
+
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             {
@@ -169,12 +174,12 @@ public class CourseMaterialsController : ControllerBase
                 return BadRequest(new { message = "File is required" });
             }
 
-            var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".zip", ".rar" };
+            var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".csv", ".ods", ".txt", ".png", ".jpg", ".jpeg", ".zip", ".rar" };
             var fileExtension = Path.GetExtension(createDto.File.FileName).ToLowerInvariant();
             
             if (!allowedExtensions.Contains(fileExtension))
             {
-                return BadRequest(new { message = "Invalid file type. Allowed types: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, ZIP, RAR" });
+                return BadRequest(new { message = "Invalid file type. Allowed types: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, CSV, ODS, TXT, PNG, JPG, ZIP, RAR" });
             }
 
             if (createDto.File.Length > 50 * 1024 * 1024)
@@ -250,11 +255,16 @@ public class CourseMaterialsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize]
     public async Task<IActionResult> Update(Guid id, [FromForm] UpdateCourseMaterialDto updateDto)
     {
         try
         {
+            if (!IsFacultyOrAdmin())
+            {
+                return Forbid();
+            }
+
             var material = await _context.CourseMaterials.FindAsync(id);
             if (material == null)
             {
@@ -263,12 +273,12 @@ public class CourseMaterialsController : ControllerBase
 
             if (updateDto.File != null && updateDto.File.Length > 0)
             {
-                var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".zip", ".rar" };
+                var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".csv", ".ods", ".txt", ".png", ".jpg", ".jpeg", ".zip", ".rar" };
                 var fileExtension = Path.GetExtension(updateDto.File.FileName).ToLowerInvariant();
                 
                 if (!allowedExtensions.Contains(fileExtension))
                 {
-                    return BadRequest(new { message = "Invalid file type. Allowed types: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, ZIP, RAR" });
+                    return BadRequest(new { message = "Invalid file type. Allowed types: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, CSV, ODS, TXT, PNG, JPG, ZIP, RAR" });
                 }
 
                 if (updateDto.File.Length > 50 * 1024 * 1024)
@@ -341,11 +351,16 @@ public class CourseMaterialsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize]
     public async Task<IActionResult> Delete(Guid id)
     {
         try
         {
+            if (!IsFacultyOrAdmin())
+            {
+                return Forbid();
+            }
+
             var material = await _context.CourseMaterials.FindAsync(id);
             if (material == null)
             {
@@ -367,5 +382,12 @@ public class CourseMaterialsController : ControllerBase
             _logger.LogError(ex, "Error deleting course material with ID: {Id}", id);
             return StatusCode(500, new { message = "An error occurred while deleting course material" });
         }
+    }
+
+    private bool IsFacultyOrAdmin()
+    {
+        var userType = User.FindFirst("UserType")?.Value;
+        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+        return userType == "Faculty" || userRole == "Admin" || userRole == "SuperAdmin";
     }
 }

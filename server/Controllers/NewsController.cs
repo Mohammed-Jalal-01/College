@@ -5,6 +5,7 @@ using System.Security.Claims;
 using CollegeAPI.Data;
 using CollegeAPI.Models.DTOs;
 using CollegeAPI.Models.Entities;
+using CollegeAPI.Services;
 
 namespace CollegeAPI.Controllers;
 
@@ -13,11 +14,13 @@ namespace CollegeAPI.Controllers;
 public class NewsController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly IFileStorageService _fileStorageService;
     private readonly ILogger<NewsController> _logger;
 
-    public NewsController(ApplicationDbContext context, ILogger<NewsController> logger)
+    public NewsController(ApplicationDbContext context, IFileStorageService fileStorageService, ILogger<NewsController> logger)
     {
         _context = context;
+        _fileStorageService = fileStorageService;
         _logger = logger;
     }
 
@@ -37,6 +40,7 @@ public class NewsController : ControllerBase
                     ContentEn = n.ContentEn,
                     ContentAr = n.ContentAr,
                     IsFeatured = n.IsFeatured,
+                    ImageUrl = n.ImageUrl,
                     CreatedBy = n.CreatedBy,
                     CreatedByName = n.CreatedByUser.ProfileName,
                     CreatedAt = n.CreatedAt,
@@ -70,6 +74,7 @@ public class NewsController : ControllerBase
                     ContentEn = n.ContentEn,
                     ContentAr = n.ContentAr,
                     IsFeatured = n.IsFeatured,
+                    ImageUrl = n.ImageUrl,
                     CreatedBy = n.CreatedBy,
                     CreatedByName = n.CreatedByUser.ProfileName,
                     CreatedAt = n.CreatedAt,
@@ -102,6 +107,7 @@ public class NewsController : ControllerBase
                     ContentEn = n.ContentEn,
                     ContentAr = n.ContentAr,
                     IsFeatured = n.IsFeatured,
+                    ImageUrl = n.ImageUrl,
                     CreatedBy = n.CreatedBy,
                     CreatedByName = n.CreatedByUser.ProfileName,
                     CreatedAt = n.CreatedAt,
@@ -125,7 +131,7 @@ public class NewsController : ControllerBase
 
     [HttpPost]
     [Authorize(Policy = "AdminOnly")]
-    public async Task<IActionResult> Create([FromBody] CreateNewsDto createNewsDto)
+    public async Task<IActionResult> Create([FromForm] CreateNewsDto createNewsDto)
     {
         try
         {
@@ -135,14 +141,21 @@ public class NewsController : ControllerBase
                 return Unauthorized(new { message = "Invalid user token" });
             }
 
+            string? imageUrl = null;
+            if (createNewsDto.Image != null && createNewsDto.Image.Length > 0)
+            {
+                imageUrl = await _fileStorageService.SaveFileAsync(createNewsDto.Image, "images");
+            }
+
             var news = new News
             {
                 Id = Guid.NewGuid(),
-                TitleEn = createNewsDto.TitleEn,
-                TitleAr = createNewsDto.TitleAr,
-                ContentEn = createNewsDto.ContentEn,
-                ContentAr = createNewsDto.ContentAr,
+                TitleEn = createNewsDto.Title,
+                TitleAr = createNewsDto.Title,
+                ContentEn = createNewsDto.Content,
+                ContentAr = createNewsDto.Content,
                 IsFeatured = createNewsDto.IsFeatured,
+                ImageUrl = imageUrl,
                 CreatedBy = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -164,6 +177,7 @@ public class NewsController : ControllerBase
                     ContentEn = n.ContentEn,
                     ContentAr = n.ContentAr,
                     IsFeatured = n.IsFeatured,
+                    ImageUrl = n.ImageUrl,
                     CreatedBy = n.CreatedBy,
                     CreatedByName = n.CreatedByUser.ProfileName,
                     CreatedAt = n.CreatedAt,
@@ -182,7 +196,7 @@ public class NewsController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Policy = "AdminOnly")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateNewsDto updateNewsDto)
+    public async Task<IActionResult> Update(Guid id, [FromForm] UpdateNewsDto updateNewsDto)
     {
         try
         {
@@ -192,10 +206,19 @@ public class NewsController : ControllerBase
                 return NotFound(new { message = "News not found" });
             }
 
-            news.TitleEn = updateNewsDto.TitleEn;
-            news.TitleAr = updateNewsDto.TitleAr;
-            news.ContentEn = updateNewsDto.ContentEn;
-            news.ContentAr = updateNewsDto.ContentAr;
+            if (updateNewsDto.Image != null && updateNewsDto.Image.Length > 0)
+            {
+                if (!string.IsNullOrEmpty(news.ImageUrl))
+                {
+                    await _fileStorageService.DeleteFileAsync(news.ImageUrl);
+                }
+                news.ImageUrl = await _fileStorageService.SaveFileAsync(updateNewsDto.Image, "images");
+            }
+
+            news.TitleEn = updateNewsDto.Title;
+            news.TitleAr = updateNewsDto.Title;
+            news.ContentEn = updateNewsDto.Content;
+            news.ContentAr = updateNewsDto.Content;
             news.IsFeatured = updateNewsDto.IsFeatured;
             news.UpdatedAt = DateTime.UtcNow;
 
@@ -215,6 +238,7 @@ public class NewsController : ControllerBase
                     ContentEn = n.ContentEn,
                     ContentAr = n.ContentAr,
                     IsFeatured = n.IsFeatured,
+                    ImageUrl = n.ImageUrl,
                     CreatedBy = n.CreatedBy,
                     CreatedByName = n.CreatedByUser.ProfileName,
                     CreatedAt = n.CreatedAt,
@@ -241,6 +265,11 @@ public class NewsController : ControllerBase
             if (news == null)
             {
                 return NotFound(new { message = "News not found" });
+            }
+
+            if (!string.IsNullOrEmpty(news.ImageUrl))
+            {
+                await _fileStorageService.DeleteFileAsync(news.ImageUrl);
             }
 
             _context.News.Remove(news);

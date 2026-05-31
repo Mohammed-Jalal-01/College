@@ -5,6 +5,7 @@ using System.Security.Claims;
 using CollegeAPI.Data;
 using CollegeAPI.Models.DTOs;
 using CollegeAPI.Models.Entities;
+using CollegeAPI.Services;
 
 namespace CollegeAPI.Controllers;
 
@@ -13,11 +14,13 @@ namespace CollegeAPI.Controllers;
 public class ActivitiesController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly IFileStorageService _fileStorageService;
     private readonly ILogger<ActivitiesController> _logger;
 
-    public ActivitiesController(ApplicationDbContext context, ILogger<ActivitiesController> logger)
+    public ActivitiesController(ApplicationDbContext context, IFileStorageService fileStorageService, ILogger<ActivitiesController> logger)
     {
         _context = context;
+        _fileStorageService = fileStorageService;
         _logger = logger;
     }
 
@@ -36,6 +39,7 @@ public class ActivitiesController : ControllerBase
                     TitleAr = a.TitleAr,
                     ContentEn = a.ContentEn,
                     ContentAr = a.ContentAr,
+                    ImageUrl = a.ImageUrl,
                     Date = a.Date,
                     CreatedBy = a.CreatedBy,
                     CreatedByName = a.CreatedByUser.ProfileName,
@@ -68,6 +72,7 @@ public class ActivitiesController : ControllerBase
                     TitleAr = a.TitleAr,
                     ContentEn = a.ContentEn,
                     ContentAr = a.ContentAr,
+                    ImageUrl = a.ImageUrl,
                     Date = a.Date,
                     CreatedBy = a.CreatedBy,
                     CreatedByName = a.CreatedByUser.ProfileName,
@@ -92,7 +97,7 @@ public class ActivitiesController : ControllerBase
 
     [HttpPost]
     [Authorize(Policy = "AdminOnly")]
-    public async Task<IActionResult> Create([FromBody] CreateActivityDto createActivityDto)
+    public async Task<IActionResult> Create([FromForm] CreateActivityDto createActivityDto)
     {
         try
         {
@@ -102,14 +107,21 @@ public class ActivitiesController : ControllerBase
                 return Unauthorized(new { message = "Invalid user token" });
             }
 
+            string? imageUrl = null;
+            if (createActivityDto.Image != null && createActivityDto.Image.Length > 0)
+            {
+                imageUrl = await _fileStorageService.SaveFileAsync(createActivityDto.Image, "images");
+            }
+
             var activity = new Activity
             {
                 Id = Guid.NewGuid(),
-                TitleEn = createActivityDto.TitleEn,
-                TitleAr = createActivityDto.TitleAr,
-                ContentEn = createActivityDto.ContentEn,
-                ContentAr = createActivityDto.ContentAr,
-                Date = createActivityDto.Date,
+                TitleEn = createActivityDto.Title,
+                TitleAr = createActivityDto.Title,
+                ContentEn = createActivityDto.Content,
+                ContentAr = createActivityDto.Content,
+                Date = createActivityDto.Date == default ? DateTime.UtcNow : DateTime.SpecifyKind(createActivityDto.Date, DateTimeKind.Utc),
+                ImageUrl = imageUrl,
                 CreatedBy = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -130,6 +142,7 @@ public class ActivitiesController : ControllerBase
                     TitleAr = a.TitleAr,
                     ContentEn = a.ContentEn,
                     ContentAr = a.ContentAr,
+                    ImageUrl = a.ImageUrl,
                     Date = a.Date,
                     CreatedBy = a.CreatedBy,
                     CreatedByName = a.CreatedByUser.ProfileName,
@@ -149,7 +162,7 @@ public class ActivitiesController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Policy = "AdminOnly")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateActivityDto updateActivityDto)
+    public async Task<IActionResult> Update(Guid id, [FromForm] UpdateActivityDto updateActivityDto)
     {
         try
         {
@@ -159,11 +172,20 @@ public class ActivitiesController : ControllerBase
                 return NotFound(new { message = "Activity not found" });
             }
 
-            activity.TitleEn = updateActivityDto.TitleEn;
-            activity.TitleAr = updateActivityDto.TitleAr;
-            activity.ContentEn = updateActivityDto.ContentEn;
-            activity.ContentAr = updateActivityDto.ContentAr;
-            activity.Date = updateActivityDto.Date;
+            if (updateActivityDto.Image != null && updateActivityDto.Image.Length > 0)
+            {
+                if (!string.IsNullOrEmpty(activity.ImageUrl))
+                {
+                    await _fileStorageService.DeleteFileAsync(activity.ImageUrl);
+                }
+                activity.ImageUrl = await _fileStorageService.SaveFileAsync(updateActivityDto.Image, "images");
+            }
+
+            activity.TitleEn = updateActivityDto.Title;
+            activity.TitleAr = updateActivityDto.Title;
+            activity.ContentEn = updateActivityDto.Content;
+            activity.ContentAr = updateActivityDto.Content;
+            activity.Date = updateActivityDto.Date == default ? activity.Date : DateTime.SpecifyKind(updateActivityDto.Date, DateTimeKind.Utc);
             activity.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -181,6 +203,7 @@ public class ActivitiesController : ControllerBase
                     TitleAr = a.TitleAr,
                     ContentEn = a.ContentEn,
                     ContentAr = a.ContentAr,
+                    ImageUrl = a.ImageUrl,
                     Date = a.Date,
                     CreatedBy = a.CreatedBy,
                     CreatedByName = a.CreatedByUser.ProfileName,
@@ -208,6 +231,11 @@ public class ActivitiesController : ControllerBase
             if (activity == null)
             {
                 return NotFound(new { message = "Activity not found" });
+            }
+
+            if (!string.IsNullOrEmpty(activity.ImageUrl))
+            {
+                await _fileStorageService.DeleteFileAsync(activity.ImageUrl);
             }
 
             _context.Activities.Remove(activity);

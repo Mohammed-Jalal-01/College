@@ -16,13 +16,17 @@ export const newsService = {
     return response.data;
   },
 
-  create: async (data) => {
-    const response = await apiClient.post('/news', data);
+  create: async (formData) => {
+    const response = await apiClient.post('/news', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   },
 
-  update: async (id, data) => {
-    const response = await apiClient.put(`/news/${id}`, data);
+  update: async (id, formData) => {
+    const response = await apiClient.put(`/news/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   },
 
