@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
 const ProtectedRoute = ({ children, requireAdmin = false, requireSuperAdmin = false }) => {
-  const { isAuthenticated, isAdmin, isSuperAdmin, loading } = useAuth()
+  const { isAuthenticated, isAdmin, isSuperAdmin, loading, user } = useAuth()
 
   if (loading) {
     return (
@@ -14,6 +14,10 @@ const ProtectedRoute = ({ children, requireAdmin = false, requireSuperAdmin = fa
 
   if (!isAuthenticated) {
     return <Navigate to="/auth/login" replace />
+  }
+
+  if (user?.userType === 'Student' && user?.requiresStudentInfo) {
+    return <Navigate to="/auth/student-info" replace />
   }
 
   if (requireSuperAdmin && !isSuperAdmin) {

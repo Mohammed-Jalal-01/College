@@ -2,7 +2,18 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Check, X as XIcon } from 'lucide-react'
+
+const getPasswordChecks = (password) => ({
+  length: password.length >= 8,
+  uppercase: /[A-Z]/.test(password),
+  lowercase: /[a-z]/.test(password),
+  number: /[0-9]/.test(password),
+  special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
+})
+
+const isPasswordStrong = (password) =>
+  Object.values(getPasswordChecks(password)).every(Boolean)
 
 const RegisterPage = () => {
   const navigate = useNavigate()
@@ -41,8 +52,11 @@ const RegisterPage = () => {
 
     if (!formData.password) {
       newErrors.password = t('validation.required', 'This field is required')
-    } else if (formData.password.length < 8) {
-      newErrors.password = t('validation.passwordLength', 'Password must be at least 8 characters')
+    } else if (!isPasswordStrong(formData.password)) {
+      newErrors.password = t(
+        'validation.passwordRequirements',
+        'Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character'
+      )
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -173,6 +187,30 @@ const RegisterPage = () => {
                 </button>
               </div>
               {errors.password && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>}
+              {formData.password && (
+                <ul className="mt-3 space-y-1">
+                  {[
+                    { key: 'length', label: t('validation.pwLength', 'At least 8 characters') },
+                    { key: 'uppercase', label: t('validation.pwUppercase', 'One uppercase letter') },
+                    { key: 'lowercase', label: t('validation.pwLowercase', 'One lowercase letter') },
+                    { key: 'number', label: t('validation.pwNumber', 'One number') },
+                    { key: 'special', label: t('validation.pwSpecial', 'One special character') },
+                  ].map((req) => {
+                    const passed = getPasswordChecks(formData.password)[req.key]
+                    return (
+                      <li
+                        key={req.key}
+                        className={`flex items-center gap-2 text-xs ${
+                          passed ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'
+                        }`}
+                      >
+                        {passed ? <Check className="w-3.5 h-3.5" /> : <XIcon className="w-3.5 h-3.5" />}
+                        <span>{req.label}</span>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
             </div>
 
             <div>

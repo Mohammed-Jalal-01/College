@@ -21,9 +21,13 @@ client/src/
 ├── components/           # Reusable UI components
 │   ├── layout/          # Layout components
 │   │   ├── Header.jsx
-│   │   └── Footer.jsx
+│   │   ├── Footer.jsx
+│   │   ├── MainLayout.jsx   # Public/shared layout (Header + Footer)
+│   │   └── AdminLayout.jsx  # Admin shell with responsive sidebar
 │   ├── auth/            # Authentication components
 │   └── common/          # Shared components
+│       ├── ProtectedRoute.jsx  # Auth + role + student-info route guard
+│       └── ErrorBoundary.jsx   # Top-level error boundary
 ├── pages/               # Page components
 │   ├── public/          # Public pages
 │   │   ├── HomePage.jsx
@@ -291,25 +295,91 @@ export const ThemeProvider = ({ children }) => {
 
 ## Protected Route Implementation
 
+**File Location:** `client/src/components/common/ProtectedRoute.jsx`
+
+The guard enforces, in order: authentication, student-info completion, and role
+requirements. Role checks use the `requireAdmin` and `requireSuperAdmin` flags
+(an Admin or SuperAdmin satisfies `requireAdmin`; only a SuperAdmin satisfies
+`requireSuperAdmin`).
+
 ```javascript
-const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { isAuthenticated, user, loading } = useAuth();
+const ProtectedRoute = ({ children, requireAdmin = false, requireSuperAdmin = false }) => {
+  const { isAuthenticated, isAdmin, isSuperAdmin, loading, user } = useAuth();
 
   if (loading) {
     return <LoadingSpinner />;
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/auth/login" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  // Students must complete their profile before accessing protected features.
+  if (user?.userType === 'Student' && user?.requiresStudentInfo) {
+    return <Navigate to="/auth/student-info" replace />;
+  }
+
+  if (requireSuperAdmin && !isSuperAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (requireAdmin && !isAdmin) {
     return <Navigate to="/" replace />;
   }
 
   return children;
 };
 ```
+
+## Admin Layout and Navigation
+
+**File Location:** `client/src/components/layout/AdminLayout.jsx`
+
+All `/admin/*` routes render inside `AdminLayout`, which provides a consistent
+shell so every management page is reachable from one place. Previously the
+management pages had routes but no navigation links, making them reachable only
+by typing the URL.
+
+Features:
+- Responsive sidebar: fixed on desktop, slide-in drawer with overlay on mobile.
+- Role-based links: the User Management link is only shown to SuperAdmin.
+- RTL aware: the sidebar anchors right and slides correctly in Arabic.
+- Top bar with theme toggle, language toggle, current user, Back to Site, and logout.
+- Dark mode support throughout.
+
+The nested route structure wraps the layout once and applies role guards per child:
+
+```javascript
+<Route
+  path="/admin"
+  element={
+    <ProtectedRoute requireAdmin>
+      <AdminLayout />
+    </ProtectedRoute>
+  }
+>
+  <Route index element={<AdminDashboard />} />
+  <Route path="news" element={<NewsManagement />} />
+  {/* ...other management pages... */}
+  <Route
+    path="users"
+    element={
+      <ProtectedRoute requireSuperAdmin>
+        <UserManagement />
+      </ProtectedRoute>
+    }
+  />
+</Route>
+```
+
+## Error Handling
+
+**File Location:** `client/src/components/common/ErrorBoundary.jsx`
+
+A top-level `ErrorBoundary` wraps the application in `main.jsx`. Any uncaught
+render error is caught and a localized fallback UI is shown (with Reload and Go
+Home actions) instead of an unrecoverable blank screen. The error detail is only
+rendered in development builds.
 
 ## Service Layer
 

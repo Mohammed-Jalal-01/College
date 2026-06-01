@@ -39,7 +39,7 @@ const StudentInfoPage = () => {
         setBranches(branchesData)
         setStudyTypes(studyTypesData)
         setStages(stagesData)
-      } catch (error) {
+      } catch {
         setApiError(t('error.loadingData', 'Failed to load data. Please refresh the page.'))
       } finally {
         setDataLoading(false)

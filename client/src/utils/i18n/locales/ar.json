@@ -78,7 +78,12 @@
     "student": "طالب",
     "faculty": "عضو هيئة تدريس",
     "saving": "جاري الحفظ...",
-    "actions": "الإجراءات"
+    "actions": "الإجراءات",
+    "close": "إغلاق",
+    "menu": "القائمة",
+    "toggleTheme": "تبديل المظهر",
+    "toggleLanguage": "تبديل اللغة",
+    "select": "اختر..."
   },
   "content": {
     "news": "الأخبار",
@@ -223,6 +228,10 @@
       "monthlyRegistrations": "التسجيلات الشهرية",
       "contentPerMonth": "المحتوى المنشأ شهريا",
       "noData": "لا توجد بيانات"
+    },
+    "nav": {
+      "dashboard": "لوحة التحكم",
+      "backToSite": "العودة إلى الموقع"
     }
   },
   "userManagement": {
@@ -258,5 +267,22 @@
     "superAdmin": "عميد الكلية",
     "admin": "مدير",
     "regular": "عادي"
+  },
+  "error": {
+    "boundaryTitle": "حدث خطأ ما",
+    "boundaryMessage": "حدث خطأ غير متوقع. يرجى إعادة تحميل الصفحة.",
+    "reload": "إعادة تحميل الصفحة",
+    "goHome": "الذهاب إلى الرئيسية"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "invalidEmail": "بريد إلكتروني غير صالح",
+    "passwordMismatch": "كلمتا المرور غير متطابقتين",
+    "passwordRequirements": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل وتتضمن حرفًا كبيرًا وصغيرًا ورقمًا ورمزًا خاصًا",
+    "pwLength": "8 أحرف على الأقل",
+    "pwUppercase": "حرف كبير واحد",
+    "pwLowercase": "حرف صغير واحد",
+    "pwNumber": "رقم واحد",
+    "pwSpecial": "رمز خاص واحد"
   }
 }

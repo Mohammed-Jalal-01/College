@@ -78,7 +78,12 @@
     "student": "Student",
     "faculty": "Faculty",
     "saving": "Saving...",
-    "actions": "Actions"
+    "actions": "Actions",
+    "close": "Close",
+    "menu": "Menu",
+    "toggleTheme": "Toggle theme",
+    "toggleLanguage": "Toggle language",
+    "select": "Select..."
   },
   "content": {
     "news": "News",
@@ -223,6 +228,10 @@
       "monthlyRegistrations": "Monthly Registrations",
       "contentPerMonth": "Content Created per Month",
       "noData": "No data available"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "backToSite": "Back to Site"
     }
   },
   "userManagement": {
@@ -258,5 +267,22 @@
     "superAdmin": "College Dean",
     "admin": "Admin",
     "regular": "Regular"
+  },
+  "error": {
+    "boundaryTitle": "Something went wrong",
+    "boundaryMessage": "An unexpected error occurred. Please try reloading the page.",
+    "reload": "Reload page",
+    "goHome": "Go to home"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordMismatch": "Passwords do not match",
+    "passwordRequirements": "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character",
+    "pwLength": "At least 8 characters",
+    "pwUppercase": "One uppercase letter",
+    "pwLowercase": "One lowercase letter",
+    "pwNumber": "One number",
+    "pwSpecial": "One special character"
   }
 }

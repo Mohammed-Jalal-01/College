@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import MainLayout from './components/layout/MainLayout'
+import AdminLayout from './components/layout/AdminLayout'
 import HomePage from './pages/public/HomePage'
 import AboutPage from './pages/public/AboutPage'
 import ActivitiesPage from './pages/public/ActivitiesPage'
@@ -73,70 +74,28 @@ function App() {
           <Route path="student-info" element={<StudentInfoPage />} />
         </Route>
 
-        <Route path="/admin">
-          <Route 
-            index 
-            element={
-              <ProtectedRoute requireAdmin>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="news" 
-            element={
-              <ProtectedRoute requireAdmin>
-                <NewsManagement />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="activities" 
-            element={
-              <ProtectedRoute requireAdmin>
-                <ActivitiesManagement />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="departments" 
-            element={
-              <ProtectedRoute requireAdmin>
-                <DepartmentsManagement />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="about-college" 
-            element={
-              <ProtectedRoute requireAdmin>
-                <AboutCollegeManagement />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="schedules" 
-            element={
-              <ProtectedRoute requireAdmin>
-                <SchedulesManagement />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="materials" 
-            element={
-              <ProtectedRoute requireAdmin>
-                <MaterialsManagement />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="users" 
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute requireAdmin>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="news" element={<NewsManagement />} />
+          <Route path="activities" element={<ActivitiesManagement />} />
+          <Route path="departments" element={<DepartmentsManagement />} />
+          <Route path="about-college" element={<AboutCollegeManagement />} />
+          <Route path="schedules" element={<SchedulesManagement />} />
+          <Route path="materials" element={<MaterialsManagement />} />
+          <Route
+            path="users"
             element={
               <ProtectedRoute requireSuperAdmin>
                 <UserManagement />
               </ProtectedRoute>
-            } 
+            }
           />
         </Route>
 
