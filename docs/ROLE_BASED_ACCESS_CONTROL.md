@@ -64,6 +64,7 @@ The College Management System implements a three-tier role-based access control 
 | Delete Own Account | ✓ | ✓ | ✓ |
 | Access Admin Dashboard | ✗ | ✓ | ✓ |
 | View Statistics | ✗ | ✓ | ✓ |
+| View Dashboard Charts | ✗ | ✓ | ✓ |
 | Create News/Updates | ✗ | ✓ | ✓ |
 | Edit News/Updates | ✗ | ✓ | ✓ |
 | Delete News/Updates | ✗ | ✓ | ✓ |
@@ -125,12 +126,16 @@ public class UserManagementController : ControllerBase
     [HttpGet("stats")]
     [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> GetUserStats() { ... }
+
+    [HttpGet("dashboard-stats")]
+    [Authorize(Policy = "AdminOnly")]
+    public async Task<IActionResult> GetDashboardStats() { ... }
 }
 ```
 
 The UserManagementController uses per-method authorization. Most endpoints
-require SuperAdminOnly, but the stats endpoint uses AdminOnly so that both
-Admin and SuperAdmin users can view dashboard statistics.
+require SuperAdminOnly, but the stats and dashboard-stats endpoints use AdminOnly
+so that both Admin and SuperAdmin users can view dashboard statistics and charts.
 
 **Public Endpoint (No Authorization):**
 
@@ -475,6 +480,19 @@ Role = "Regular"  // All new users start as Regular
   "totalSuperAdmins": 1
 }
 ```
+
+### GET /api/usermanagement/dashboard-stats
+
+**Authorization:** AdminOnly
+
+Returns aggregated statistics for the Admin Dashboard charts including:
+- Role distribution, user type distribution, students by gender/study type
+- Content distribution, students per branch/stage, materials per branch
+- Schedules per day, monthly registrations, content created per month
+
+**Response:** Object with arrays of `{ name, nameAr, value }` items for each chart.
+
+---
 
 ### POST /api/usermanagement/promote-to-admin
 

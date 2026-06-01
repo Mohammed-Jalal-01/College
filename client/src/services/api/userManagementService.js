@@ -30,4 +30,9 @@ export const userManagementService = {
     const response = await apiClient.get('/usermanagement/faculty-users');
     return response.data;
   },
+
+  getDashboardStats: async () => {
+    const response = await apiClient.get('/usermanagement/dashboard-stats');
+    return response.data;
+  },
 };

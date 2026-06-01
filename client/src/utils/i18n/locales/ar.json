@@ -209,7 +209,21 @@
     "actions": "الإجراءات",
     "create": "إنشاء",
     "update": "تحديث",
-    "userManagementDesc": "إدارة أدوار المستخدمين وترقية أعضاء هيئة التدريس ونقل صلاحيات عميد الكلية."
+    "userManagementDesc": "إدارة أدوار المستخدمين وترقية أعضاء هيئة التدريس ونقل صلاحيات عميد الكلية.",
+    "charts": {
+      "roleDistribution": "توزيع أدوار المستخدمين",
+      "userTypeDistribution": "توزيع أنواع المستخدمين",
+      "studentsByGender": "الطلاب حسب الجنس",
+      "studentsByStudyType": "الطلاب حسب نوع الدراسة",
+      "contentDistribution": "توزيع المحتوى",
+      "studentsPerBranch": "الطلاب حسب الفرع",
+      "studentsPerStage": "الطلاب حسب المرحلة",
+      "materialsPerBranch": "المواد حسب الفرع",
+      "schedulesPerDay": "الجداول حسب اليوم",
+      "monthlyRegistrations": "التسجيلات الشهرية",
+      "contentPerMonth": "المحتوى المنشأ شهريا",
+      "noData": "لا توجد بيانات"
+    }
   },
   "userManagement": {
     "totalUsers": "إجمالي المستخدمين",

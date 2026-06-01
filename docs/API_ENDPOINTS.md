@@ -279,7 +279,34 @@ Get user statistics.
 }
 ```
 
-**File Location:** `server/Controllers/UserManagementController.cs:75-102`
+**File Location:** `server/Controllers/UserManagementController.cs:76-104`
+
+---
+
+### GET /api/usermanagement/dashboard-stats
+
+Get aggregated statistics for Admin Dashboard charts (pie charts and bar charts).
+
+**Authentication:** Required (Admin or SuperAdmin)
+
+**Response:** 200 OK
+```json
+{
+  "roleDistribution": [{ "name": "Regular", "nameAr": null, "value": 90 }, ...],
+  "userTypeDistribution": [{ "name": "Student", "nameAr": null, "value": 85 }, ...],
+  "studentsByGender": [{ "name": "Male", "nameAr": null, "value": 50 }, ...],
+  "studentsByStudyType": [{ "name": "Morning", "nameAr": "صباحي", "value": 40 }, ...],
+  "contentDistribution": [{ "name": "News", "nameAr": null, "value": 10 }, ...],
+  "studentsPerBranch": [{ "name": "Software Engineering", "nameAr": "هندسة البرمجيات", "value": 30 }, ...],
+  "studentsPerStage": [{ "name": "First", "nameAr": "الاولى", "value": 25 }, ...],
+  "materialsPerBranch": [{ "name": "Software Engineering", "nameAr": "هندسة البرمجيات", "value": 15 }, ...],
+  "schedulesPerDay": [{ "name": "Sunday", "nameAr": null, "value": 8 }, ...],
+  "monthlyRegistrations": [{ "name": "2026-01", "nameAr": null, "value": 12 }, ...],
+  "contentPerMonth": [{ "name": "2026-01", "nameAr": null, "value": 5 }, ...]
+}
+```
+
+**File Location:** `server/Controllers/UserManagementController.cs:244-383`
 
 ---
 

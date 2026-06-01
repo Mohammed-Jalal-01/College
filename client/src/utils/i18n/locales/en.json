@@ -209,7 +209,21 @@
     "actions": "Actions",
     "create": "Create",
     "update": "Update",
-    "userManagementDesc": "Manage user roles, promote faculty to admin, and transfer college dean privileges."
+    "userManagementDesc": "Manage user roles, promote faculty to admin, and transfer college dean privileges.",
+    "charts": {
+      "roleDistribution": "User Roles Distribution",
+      "userTypeDistribution": "User Type Distribution",
+      "studentsByGender": "Students by Gender",
+      "studentsByStudyType": "Students by Study Type",
+      "contentDistribution": "Content Distribution",
+      "studentsPerBranch": "Students per Branch",
+      "studentsPerStage": "Students per Stage",
+      "materialsPerBranch": "Materials per Branch",
+      "schedulesPerDay": "Schedules per Day",
+      "monthlyRegistrations": "Monthly Registrations",
+      "contentPerMonth": "Content Created per Month",
+      "noData": "No data available"
+    }
   },
   "userManagement": {
     "totalUsers": "Total Users",

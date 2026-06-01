@@ -524,6 +524,30 @@ const HomePage = () => {
 7. Form validation
 8. Responsive design
 
+## Dashboard Charts
+
+**File Location:** `client/src/pages/admin/AdminDashboard.jsx`
+
+**Library:** recharts (installed as a dependency)
+
+**Purpose:** Displays interactive pie and bar charts on the Admin Dashboard providing visual data analytics for administrators.
+
+**Charts:**
+- Pie Charts: User Roles Distribution, User Type Distribution, Students by Gender, Students by Study Type, Content Distribution
+- Bar Charts: Students per Branch, Students per Stage, Materials per Branch, Schedules per Day, Monthly Registrations, Content Created per Month
+
+**Features:**
+- Responsive grid layout (2 columns on desktop, 1 on mobile)
+- Dark mode support via custom tooltip component
+- Bilingual labels (English/Arabic) using nameAr field from API
+- Loading spinner while fetching data
+- Graceful empty state when no data is available
+- Authorization: accessible to Admin and SuperAdmin roles (AdminOnly policy)
+
+**Data Source:** `GET /api/usermanagement/dashboard-stats` endpoint
+
+---
+
 ## Future Enhancements
 
 - Implement React Query for server state

@@ -241,6 +241,147 @@ public class UserManagementController : ControllerBase
         }
     }
 
+    [HttpGet("dashboard-stats")]
+    [Authorize(Policy = "AdminOnly")]
+    public async Task<IActionResult> GetDashboardStats()
+    {
+        try
+        {
+            var sixMonthsAgo = DateTime.UtcNow.AddMonths(-6);
+
+            var roleDistribution = await _context.Users
+                .GroupBy(u => u.Role)
+                .Select(g => new ChartDataItem { Name = g.Key, Value = g.Count() })
+                .ToListAsync();
+
+            var userTypeDistribution = await _context.Users
+                .GroupBy(u => u.UserType)
+                .Select(g => new ChartDataItem { Name = g.Key, Value = g.Count() })
+                .ToListAsync();
+
+            var studentsByGender = await _context.Students
+                .GroupBy(s => s.Gender)
+                .Select(g => new ChartDataItem { Name = g.Key, Value = g.Count() })
+                .ToListAsync();
+
+            var studentsByStudyType = await (
+                from s in _context.Students
+                join st in _context.StudyTypes on s.StudyTypeId equals st.Id
+                group s by new { st.NameEn, st.NameAr } into g
+                select new ChartDataItem
+                {
+                    Name = g.Key.NameEn,
+                    NameAr = g.Key.NameAr,
+                    Value = g.Count()
+                }).ToListAsync();
+
+            var contentDistribution = new List<ChartDataItem>
+            {
+                new() { Name = "News", Value = await _context.News.CountAsync() },
+                new() { Name = "Activities", Value = await _context.Activities.CountAsync() },
+                new() { Name = "Materials", Value = await _context.CourseMaterials.CountAsync() },
+                new() { Name = "Grades", Value = await _context.Grades.CountAsync() }
+            };
+
+            var studentsPerBranch = await (
+                from s in _context.Students
+                join b in _context.Branches on s.BranchId equals b.Id
+                group s by new { b.NameEn, b.NameAr } into g
+                select new ChartDataItem
+                {
+                    Name = g.Key.NameEn,
+                    NameAr = g.Key.NameAr,
+                    Value = g.Count()
+                }).ToListAsync();
+
+            var studentsPerStage = await (
+                from s in _context.Students
+                join st in _context.Stages on s.StageId equals st.Id
+                group s by new { st.NameEn, st.NameAr, st.StageNumber } into g
+                orderby g.Key.StageNumber
+                select new ChartDataItem
+                {
+                    Name = g.Key.NameEn,
+                    NameAr = g.Key.NameAr,
+                    Value = g.Count()
+                }).ToListAsync();
+
+            var materialsPerBranch = await (
+                from m in _context.CourseMaterials
+                join b in _context.Branches on m.BranchId equals b.Id
+                group m by new { b.NameEn, b.NameAr } into g
+                select new ChartDataItem
+                {
+                    Name = g.Key.NameEn,
+                    NameAr = g.Key.NameAr,
+                    Value = g.Count()
+                }).ToListAsync();
+
+            var schedulesPerDay = await _context.LectureSchedules
+                .GroupBy(s => s.Day)
+                .Select(g => new ChartDataItem { Name = g.Key, Value = g.Count() })
+                .ToListAsync();
+
+            var monthlyRegistrations = await _context.Users
+                .Where(u => u.CreatedAt >= sixMonthsAgo)
+                .GroupBy(u => new { u.CreatedAt.Year, u.CreatedAt.Month })
+                .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
+                .Select(g => new ChartDataItem
+                {
+                    Name = $"{g.Key.Year}-{g.Key.Month:D2}",
+                    Value = g.Count()
+                })
+                .ToListAsync();
+
+            var newsPerMonth = await _context.News
+                .Where(n => n.CreatedAt >= sixMonthsAgo)
+                .GroupBy(n => new { n.CreatedAt.Year, n.CreatedAt.Month })
+                .Select(g => new { g.Key.Year, g.Key.Month, Count = g.Count() })
+                .ToListAsync();
+
+            var activitiesPerMonth = await _context.Activities
+                .Where(a => a.CreatedAt >= sixMonthsAgo)
+                .GroupBy(a => new { a.CreatedAt.Year, a.CreatedAt.Month })
+                .Select(g => new { g.Key.Year, g.Key.Month, Count = g.Count() })
+                .ToListAsync();
+
+            var allMonths = newsPerMonth.Select(x => (x.Year, x.Month))
+                .Union(activitiesPerMonth.Select(x => (x.Year, x.Month)))
+                .Distinct()
+                .OrderBy(x => x.Year).ThenBy(x => x.Month)
+                .ToList();
+
+            var contentPerMonth = allMonths.Select(m => new ChartDataItem
+            {
+                Name = $"{m.Year}-{m.Month:D2}",
+                Value = (newsPerMonth.FirstOrDefault(n => n.Year == m.Year && n.Month == m.Month)?.Count ?? 0)
+                    + (activitiesPerMonth.FirstOrDefault(a => a.Year == m.Year && a.Month == m.Month)?.Count ?? 0)
+            }).ToList();
+
+            var result = new DashboardStatsDto
+            {
+                RoleDistribution = roleDistribution,
+                UserTypeDistribution = userTypeDistribution,
+                StudentsByGender = studentsByGender,
+                StudentsByStudyType = studentsByStudyType,
+                ContentDistribution = contentDistribution,
+                StudentsPerBranch = studentsPerBranch,
+                StudentsPerStage = studentsPerStage,
+                MaterialsPerBranch = materialsPerBranch,
+                SchedulesPerDay = schedulesPerDay,
+                MonthlyRegistrations = monthlyRegistrations,
+                ContentPerMonth = contentPerMonth
+            };
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving dashboard stats");
+            return StatusCode(500, new { message = "An error occurred while retrieving dashboard statistics" });
+        }
+    }
+
     [HttpGet("faculty-users")]
     [Authorize(Policy = "SuperAdminOnly")]
     public async Task<IActionResult> GetFacultyUsers()
