@@ -641,6 +641,32 @@ const HomePage = () => {
 
 ---
 
+## Materials Page (Card Grid)
+
+**File Location:** `client/src/pages/public/MaterialsPage.jsx`
+
+**Layout:** Responsive card grid (1 col mobile, 2 col desktop). Each material is rendered as an individual card displaying title, file type badge, description excerpt, metadata (branch, stage, study type, course, uploader), and an action bar with download/edit/delete buttons.
+
+**Role Authority:**
+- Download: available to all users
+- Add: Faculty and Admin/SuperAdmin (`isFacultyOrAdmin`)
+- Edit/Delete per card: Faculty and Admin/SuperAdmin (`isFacultyOrAdmin`)
+
+---
+
+## Grades Page (Card Grid)
+
+**File Location:** `client/src/pages/public/GradesPage.jsx`
+
+**Layout:** Responsive card grid (1 col mobile, 2 col tablet, 3 col desktop). Each grade is rendered as an individual card showing subject name, file type badge, metadata (branch, stage, study type, file name, uploader), and an action bar.
+
+**Role Authority:**
+- Download: available to all users
+- Add: Faculty and Admin/SuperAdmin (`isFacultyOrAdmin`)
+- Edit/Delete per card: Admin/SuperAdmin always; Faculty only for their own uploads (`canModify`)
+
+---
+
 ## Future Enhancements
 
 - Implement React Query for server state

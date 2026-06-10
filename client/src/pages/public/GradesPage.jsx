@@ -24,7 +24,6 @@ const GradesPage = () => {
   const [studyTypes, setStudyTypes] = useState([]);
   const [stages, setStages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editingGrade, setEditingGrade] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -75,9 +74,6 @@ const GradesPage = () => {
       setLoading(true);
       const data = await gradesService.getAll(filters);
       setGrades(data);
-      if (data.length > 0 && !activeTab) {
-        setActiveTab(data[0].id);
-      }
     } catch (err) {
       console.error('Error fetching grades:', err);
     } finally {
@@ -87,12 +83,10 @@ const GradesPage = () => {
 
   const handleFilterChange = (key, value) => {
     setFilters({ ...filters, [key]: value });
-    setActiveTab(null);
   };
 
   const handleResetFilters = () => {
     setFilters({ branchId: '', studyTypeId: '', stageId: '' });
-    setActiveTab(null);
   };
 
   const resetForm = () => {
@@ -176,16 +170,13 @@ const GradesPage = () => {
 
     try {
       await gradesService.delete(gradeId);
-      if (activeTab === gradeId) {
-        setActiveTab(null);
-      }
       await fetchGrades();
     } catch (err) {
       console.error('Error deleting grade:', err);
     }
   };
 
-  const activeGrade = grades.find((g) => g.id === activeTab);
+  const apiBase = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
 
   const canModify = (grade) => {
     if (!isFacultyOrAdmin) return false;
@@ -281,107 +272,54 @@ const GradesPage = () => {
           </p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-          <div className="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
-            <nav className="flex" aria-label="Tabs">
-              {grades.map((grade) => (
-                <button
-                  key={grade.id}
-                  onClick={() => setActiveTab(grade.id)}
-                  className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === grade.id
-                      ? 'border-primary-600 text-primary-600 dark:text-primary-400'
-                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center">
-                    <FileSpreadsheet className="w-4 h-4 mr-2" />
-                    {grade.subjectName}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {grades.map((grade) => (
+            <article key={grade.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden transition-shadow flex flex-col">
+              <div className="p-5 flex-1">
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="w-10 h-10 flex-shrink-0 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center">
+                    <FileSpreadsheet className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                   </div>
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          {activeGrade && (
-            <div className="p-6">
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                    {activeGrade.subjectName}
-                  </h3>
-                  <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                    <p>
-                      <span className="font-medium">{t('filters.branch')}:</span>{' '}
-                      {i18n.language === 'ar'
-                        ? activeGrade.branchNameAr
-                        : activeGrade.branchNameEn}
-                    </p>
-                    <p>
-                      <span className="font-medium">{t('filters.stage')}:</span>{' '}
-                      {i18n.language === 'ar'
-                        ? activeGrade.stageNameAr
-                        : activeGrade.stageNameEn}
-                    </p>
-                    <p>
-                      <span className="font-medium">
-                        {t('filters.studyType')}:
-                      </span>{' '}
-                      {i18n.language === 'ar'
-                        ? activeGrade.studyTypeNameAr
-                        : activeGrade.studyTypeNameEn}
-                    </p>
-                    <p>
-                      <span className="font-medium">
-                        {t('grades.uploadedBy')}:
-                      </span>{' '}
-                      {activeGrade.uploadedByName}
-                    </p>
-                    <p>
-                      <span className="font-medium">
-                        {t('grades.fileName')}:
-                      </span>{' '}
-                      {activeGrade.originalFileName}
-                    </p>
-                    <p>
-                      <span className="font-medium">
-                        {t('grades.fileType')}:
-                      </span>{' '}
-                      <span className="uppercase">{activeGrade.fileType}</span>
-                    </p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-lg text-gray-900 dark:text-white truncate">
+                      {grade.subjectName}
+                    </h3>
+                    <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium uppercase rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                      {grade.fileType}
+                    </span>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2">
-                  <a
-                    href={`${import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000'}${activeGrade.fileUrl}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    {t('common.download')}
-                  </a>
-                  {canModify(activeGrade) && (
-                    <>
-                      <button
-                        onClick={() => handleOpenEdit(activeGrade)}
-                        className="flex items-center px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(activeGrade.id)}
-                        className="flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </>
-                  )}
+                <div className="space-y-1.5 text-sm text-gray-600 dark:text-gray-400">
+                  <p><span className="font-medium">{t('filters.branch')}:</span> {i18n.language === 'ar' ? grade.branchNameAr : grade.branchNameEn}</p>
+                  <p><span className="font-medium">{t('filters.stage')}:</span> {i18n.language === 'ar' ? grade.stageNameAr : grade.stageNameEn}</p>
+                  <p><span className="font-medium">{t('filters.studyType')}:</span> {i18n.language === 'ar' ? grade.studyTypeNameAr : grade.studyTypeNameEn}</p>
+                  <p><span className="font-medium">{t('grades.fileName')}:</span> {grade.originalFileName}</p>
+                  <p><span className="font-medium">{t('grades.uploadedBy')}:</span> {grade.uploadedByName}</p>
                 </div>
               </div>
-            </div>
-          )}
+              <div className="px-5 py-3 border-t border-gray-100 dark:border-gray-700 flex items-center gap-2">
+                <a
+                  href={`${apiBase}${grade.fileUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  <Download className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                  {t('common.download')}
+                </a>
+                {canModify(grade) && (
+                  <>
+                    <button onClick={() => handleOpenEdit(grade)} className="inline-flex items-center px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDelete(grade.id)} className="inline-flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </article>
+          ))}
         </div>
       )}
 

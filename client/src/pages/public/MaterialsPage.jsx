@@ -24,7 +24,6 @@ const MaterialsPage = () => {
   const [studyTypes, setStudyTypes] = useState([]);
   const [stages, setStages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -80,9 +79,6 @@ const MaterialsPage = () => {
       setLoading(true);
       const data = await materialsService.getAll(filters);
       setMaterials(data);
-      if (data.length > 0 && !activeTab) {
-        setActiveTab(data[0].id);
-      }
     } catch (err) {
       console.error('Error fetching materials:', err);
     } finally {
@@ -92,12 +88,10 @@ const MaterialsPage = () => {
 
   const handleFilterChange = (key, value) => {
     setFilters({ ...filters, [key]: value });
-    setActiveTab(null);
   };
 
   const handleResetFilters = () => {
     setFilters({ branchId: '', studyTypeId: '', stageId: '', course: '' });
-    setActiveTab(null);
   };
 
   const resetForm = () => {
@@ -183,14 +177,13 @@ const MaterialsPage = () => {
     if (!window.confirm(t('admin.confirmDelete'))) return;
     try {
       await materialsService.delete(id);
-      if (activeTab === id) setActiveTab(null);
       await fetchMaterials();
     } catch (err) {
       console.error('Error deleting material:', err);
     }
   };
 
-  const activeMaterial = materials.find((m) => m.id === activeTab);
+  const apiBase = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -247,73 +240,59 @@ const MaterialsPage = () => {
           <p className="text-gray-600 dark:text-gray-400 text-lg">{t('materials.noMaterials')}</p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-          <div className="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
-            <nav className="flex" aria-label="Tabs">
-              {materials.map((material) => (
-                <button
-                  key={material.id}
-                  onClick={() => setActiveTab(material.id)}
-                  className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === material.id
-                      ? 'border-primary-600 text-primary-600 dark:text-primary-400'
-                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2" />
-                    {i18n.language === 'ar' ? material.titleAr : material.titleEn}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {materials.map((material) => (
+            <article key={material.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden transition-shadow flex flex-col">
+              <div className="p-5 flex-1">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-10 h-10 flex-shrink-0 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                   </div>
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          {activeMaterial && (
-            <div className="p-6">
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                    {i18n.language === 'ar' ? activeMaterial.titleAr : activeMaterial.titleEn}
-                  </h3>
-                  {(activeMaterial.descriptionEn || activeMaterial.descriptionAr) && (
-                    <p className="text-gray-600 dark:text-gray-400 mb-3">
-                      {i18n.language === 'ar' ? activeMaterial.descriptionAr : activeMaterial.descriptionEn}
-                    </p>
-                  )}
-                  <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                    <p><span className="font-medium">{t('filters.branch')}:</span> {i18n.language === 'ar' ? activeMaterial.branchNameAr : activeMaterial.branchNameEn}</p>
-                    <p><span className="font-medium">{t('filters.stage')}:</span> {i18n.language === 'ar' ? activeMaterial.stageNameAr : activeMaterial.stageNameEn}</p>
-                    <p><span className="font-medium">{t('filters.studyType')}:</span> {i18n.language === 'ar' ? activeMaterial.studyTypeNameAr : activeMaterial.studyTypeNameEn}</p>
-                    <p><span className="font-medium">{t('materials.course')}:</span> {activeMaterial.course}</p>
-                    <p><span className="font-medium">{t('materials.fileType')}:</span> <span className="uppercase">{activeMaterial.fileType}</span></p>
-                    <p><span className="font-medium">{t('content.createdBy')}:</span> {activeMaterial.uploadedByName}</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-lg text-gray-900 dark:text-white truncate">
+                      {i18n.language === 'ar' ? material.titleAr : material.titleEn}
+                    </h3>
+                    <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium uppercase rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                      {material.fileType}
+                    </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <a
-                    href={`${import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000'}${activeMaterial.fileUrl}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    {t('common.download')}
-                  </a>
-                  {isFacultyOrAdmin && (
-                    <>
-                      <button onClick={() => handleOpenEdit(activeMaterial)} className="flex items-center px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => handleDelete(activeMaterial.id)} className="flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </>
-                  )}
+                {(material.descriptionEn || material.descriptionAr) && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                    {i18n.language === 'ar' ? material.descriptionAr : material.descriptionEn}
+                  </p>
+                )}
+                <div className="space-y-1.5 text-sm text-gray-600 dark:text-gray-400">
+                  <p><span className="font-medium">{t('filters.branch')}:</span> {i18n.language === 'ar' ? material.branchNameAr : material.branchNameEn}</p>
+                  <p><span className="font-medium">{t('filters.stage')}:</span> {i18n.language === 'ar' ? material.stageNameAr : material.stageNameEn}</p>
+                  <p><span className="font-medium">{t('filters.studyType')}:</span> {i18n.language === 'ar' ? material.studyTypeNameAr : material.studyTypeNameEn}</p>
+                  <p><span className="font-medium">{t('materials.course')}:</span> {material.course}</p>
+                  <p><span className="font-medium">{t('content.createdBy')}:</span> {material.uploadedByName}</p>
                 </div>
               </div>
-            </div>
-          )}
+              <div className="px-5 py-3 border-t border-gray-100 dark:border-gray-700 flex items-center gap-2">
+                <a
+                  href={`${apiBase}${material.fileUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  <Download className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                  {t('common.download')}
+                </a>
+                {isFacultyOrAdmin && (
+                  <>
+                    <button onClick={() => handleOpenEdit(material)} className="inline-flex items-center px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDelete(material.id)} className="inline-flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </article>
+          ))}
         </div>
       )}
 
