@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { newsService } from '../../services/api/newsService'
-import { Newspaper, Plus, Pencil, Trash2, X, Loader2, AlertCircle, ImageIcon } from 'lucide-react'
+import { Newspaper, Plus, Pencil, Trash2, X, Loader2, AlertCircle, ImageIcon, Calendar, BookOpen, GraduationCap, Activity, Building2, Info, ArrowRight, LayoutDashboard } from 'lucide-react'
 
 const HomePage = () => {
   const { t } = useTranslation()
   const { language } = useLanguage()
-  const { isAdmin } = useAuth()
+  const { isAdmin, isAuthenticated } = useAuth()
   const [allNews, setAllNews] = useState([])
   const [loading, setLoading] = useState(true)
   const [showNewsForm, setShowNewsForm] = useState(false)
@@ -66,65 +66,106 @@ const HomePage = () => {
     try { await newsService.delete(id); await fetchData() } catch (err) { console.error('Error:', err) }
   }
 
-  return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">{t('home.welcome')}</h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400">
-          {language === 'ar' ? 'منصة إدارة شاملة لكلية علوم الحاسوب' : 'Comprehensive management platform for Computer Science College'}
-        </p>
-      </div>
+  const quickLinks = [
+    { to: '/schedules', icon: Calendar, label: t('nav.schedules'), desc: t('home.features.schedulesDesc') },
+    { to: '/materials', icon: BookOpen, label: t('nav.materials'), desc: t('home.features.materialsDesc') },
+    { to: '/grades', icon: GraduationCap, label: t('nav.grades'), desc: t('home.features.gradesDesc') },
+    { to: '/activities', icon: Activity, label: t('nav.activities'), desc: t('home.features.activitiesDesc') },
+    { to: '/departments', icon: Building2, label: t('nav.departments'), desc: t('home.features.departmentsDesc') },
+    { to: '/about', icon: Info, label: t('nav.about'), desc: t('home.features.aboutDesc') },
+  ]
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-12">
+  return (
+    <div className="container mx-auto px-4 py-8 md:py-12">
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 to-primary-800 px-6 py-12 md:px-12 md:py-16 mb-12 shadow-xl">
+        <div className="absolute inset-0 opacity-10" aria-hidden="true">
+          <div className="absolute -top-12 -right-12 rtl:-left-12 rtl:right-auto w-64 h-64 rounded-full bg-white"></div>
+          <div className="absolute -bottom-16 -left-8 rtl:-right-8 rtl:left-auto w-72 h-72 rounded-full bg-white"></div>
+        </div>
+        <div className="relative max-w-3xl">
+          <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">{t('home.welcome')}</h1>
+          <p className="text-lg md:text-xl text-primary-100 mb-8">{t('home.tagline')}</p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            {isAdmin ? (
+              <Link to="/admin" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-primary-700 font-semibold rounded-lg hover:bg-primary-50 transition-colors">
+                <LayoutDashboard className="w-5 h-5" />{t('home.goToDashboard')}
+              </Link>
+            ) : !isAuthenticated ? (
+              <Link to="/auth/account-type" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-primary-700 font-semibold rounded-lg hover:bg-primary-50 transition-colors">
+                {t('home.getStarted')}<ArrowRight className="w-5 h-5 rtl:rotate-180" />
+              </Link>
+            ) : null}
+            <Link to="/schedules" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary-500/30 text-white font-semibold rounded-lg border border-white/40 hover:bg-primary-500/50 transition-colors">
+              <Calendar className="w-5 h-5" />{t('home.explore')}
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-12">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('home.quickAccess')}</h2>
+          <p className="text-gray-600 dark:text-gray-400">{t('home.quickAccessSubtitle')}</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {quickLinks.map(({ to, icon: Icon, label, desc }) => (
+            <Link key={to} to={to} className="group flex items-start gap-4 bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm hover:shadow-lg border border-gray-100 dark:border-gray-700 transition-all hover:-translate-y-0.5">
+              <div className="w-12 h-12 flex-shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center group-hover:bg-primary-600 transition-colors">
+                <Icon className="w-6 h-6 text-primary-600 dark:text-primary-400 group-hover:text-white transition-colors" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{label}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{desc}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mb-12">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            <Newspaper className="w-6 h-6 text-primary-600 dark:text-primary-400 mr-2" />
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('home.featuredNews')}</h2>
+            <Newspaper className="w-6 h-6 text-primary-600 dark:text-primary-400 mr-2 rtl:ml-2 rtl:mr-0" />
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('home.latestNews')}</h2>
           </div>
-          {isAdmin && <button onClick={() => { resetNewsForm(); setShowNewsForm(true) }} className="p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"><Plus className="w-4 h-4" /></button>}
+          {isAdmin && <button onClick={() => { resetNewsForm(); setShowNewsForm(true) }} className="inline-flex items-center gap-1 px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"><Plus className="w-4 h-4" />{t('content.addNews')}</button>}
         </div>
         {loading ? (
-          <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div></div>
+          <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div></div>
         ) : allNews.length > 0 ? (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {allNews.map((news) => (
-              <div key={news.id} className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0 group relative">
+              <article key={news.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden group relative transition-shadow">
                 {isAdmin && (
-                  <div className="absolute top-0 right-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => handleEditNews(news)} className="p-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"><Pencil className="w-3 h-3" /></button>
-                    <button onClick={() => handleDeleteNews(news.id)} className="p-1 bg-red-600 text-white rounded hover:bg-red-700"><Trash2 className="w-3 h-3" /></button>
+                  <div className="absolute top-2 right-2 rtl:left-2 rtl:right-auto flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    <button onClick={() => handleEditNews(news)} className="p-1.5 bg-yellow-500 text-white rounded hover:bg-yellow-600"><Pencil className="w-3 h-3" /></button>
+                    <button onClick={() => handleDeleteNews(news.id)} className="p-1.5 bg-red-600 text-white rounded hover:bg-red-700"><Trash2 className="w-3 h-3" /></button>
                   </div>
                 )}
-                {news.imageUrl && (
-                  <div className="w-full h-48 mb-3 rounded-lg overflow-hidden">
-                    <img src={`${apiBase}${news.imageUrl}`} alt="" className="w-full h-full object-cover" />
+                {news.imageUrl ? (
+                  <div className="w-full h-48 overflow-hidden">
+                    <img src={`${apiBase}${news.imageUrl}`} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  </div>
+                ) : (
+                  <div className="w-full h-48 flex items-center justify-center bg-primary-50 dark:bg-primary-900/20">
+                    <Newspaper className="w-12 h-12 text-primary-300 dark:text-primary-700" />
                   </div>
                 )}
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{language === 'ar' ? news.titleAr : news.titleEn}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">{language === 'ar' ? news.contentAr : news.contentEn}</p>
-                <p className="text-xs text-gray-500 mt-1">{formatDate(news.createdAt)}</p>
-              </div>
+                <div className="p-5">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{formatDate(news.createdAt)}</p>
+                  <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-2">{language === 'ar' ? news.titleAr : news.titleEn}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">{language === 'ar' ? news.contentAr : news.contentEn}</p>
+                </div>
+              </article>
             ))}
           </div>
         ) : (
-          <p className="text-gray-600 dark:text-gray-400">{language === 'ar' ? 'لا توجد أخبار مميزة حالياً' : 'No featured news at the moment'}</p>
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-12 text-center">
+            <Newspaper className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+            <p className="text-gray-600 dark:text-gray-400">{t('home.noNews')}</p>
+          </div>
         )}
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-6">
-        <Link to="/departments" className="bg-primary-50 dark:bg-primary-900/20 rounded-xl p-6 text-center hover:shadow-lg transition-shadow cursor-pointer">
-          <div className="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-2">6</div>
-          <p className="text-gray-700 dark:text-gray-300">{language === 'ar' ? 'الاقسام' : 'Departments'}</p>
-        </Link>
-        <div className="bg-primary-50 dark:bg-primary-900/20 rounded-xl p-6 text-center">
-          <div className="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-2">4</div>
-          <p className="text-gray-700 dark:text-gray-300">{language === 'ar' ? 'أنواع الدراسة' : 'Study Types'}</p>
-        </div>
-        <div className="bg-primary-50 dark:bg-primary-900/20 rounded-xl p-6 text-center">
-          <div className="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-2">4</div>
-          <p className="text-gray-700 dark:text-gray-300">{language === 'ar' ? 'المراحل' : 'Stages'}</p>
-        </div>
-      </div>
+      </section>
 
       {showNewsForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

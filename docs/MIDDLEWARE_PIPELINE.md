@@ -243,16 +243,45 @@ public class RateLimitingMiddleware
 }
 ```
 
-**Rate Limit Rules:**
+**Default Rate Limit Rules (secure fallback):**
 - `/api/auth/login`: 5 requests per 15 minutes
-- `/api/auth/register`: 3 requests per 60 minutes
+- `/api/auth/register`: 50 requests per 60 minutes
 - `/api/auth/*`: 10 requests per 15 minutes (catch-all)
+
+**Configurable and Environment-Aware:**
+
+The middleware reads an optional `RateLimiting` configuration section:
+
+```json
+"RateLimiting": {
+  "Enabled": null,
+  "Rules": [
+    { "Path": "/api/auth/login", "MaxRequests": 5, "WindowMinutes": 15 },
+    { "Path": "/api/auth/register", "MaxRequests": 50, "WindowMinutes": 60 },
+    { "Path": "/api/auth", "MaxRequests": 10, "WindowMinutes": 15 }
+  ]
+}
+```
+
+- `RateLimiting:Enabled`: When omitted/null, rate limiting is automatically disabled
+  in the Development environment (to allow local feature/usage testing) and enabled in
+  all other environments. Set explicitly to `true` or `false` to override.
+- `RateLimiting:Rules`: Optionally overrides per-endpoint limits. Any rule not specified
+  falls back to the secure defaults above.
+
+To run with rate limiting disabled for testing, start the API in the Development
+environment, for example:
+
+```bash
+ASPNETCORE_ENVIRONMENT=Development dotnet run
+```
 
 **Behavior:**
 - Tracks requests per IP address
 - Returns 429 Too Many Requests when limit exceeded
 - Provides retry-after information
 - Logs rate limit violations
+- Logs a warning at startup when rate limiting is disabled
 
 **Short-Circuit:** When rate limit exceeded, pipeline stops (doesn't proceed to next middleware)
 

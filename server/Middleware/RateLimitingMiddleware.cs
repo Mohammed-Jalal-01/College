@@ -8,23 +8,71 @@ public class RateLimitingMiddleware
     private readonly RequestDelegate _next;
     private readonly IMemoryCache _cache;
     private readonly ILogger<RateLimitingMiddleware> _logger;
+    private readonly bool _enabled;
+    private readonly Dictionary<string, RateLimitRule> _rateLimitRules;
 
-    private static readonly Dictionary<string, RateLimitRule> RateLimitRules = new()
+    private static readonly Dictionary<string, RateLimitRule> DefaultRateLimitRules = new()
     {
         { "/api/auth/login", new RateLimitRule { MaxRequests = 5, WindowMinutes = 15 } },
         { "/api/auth/register", new RateLimitRule { MaxRequests = 50, WindowMinutes = 60 } },
         { "/api/auth", new RateLimitRule { MaxRequests = 10, WindowMinutes = 15 } }
     };
 
-    public RateLimitingMiddleware(RequestDelegate next, IMemoryCache cache, ILogger<RateLimitingMiddleware> logger)
+    public RateLimitingMiddleware(
+        RequestDelegate next,
+        IMemoryCache cache,
+        ILogger<RateLimitingMiddleware> logger,
+        IConfiguration configuration,
+        IWebHostEnvironment environment)
     {
         _next = next;
         _cache = cache;
         _logger = logger;
+
+        var section = configuration.GetSection("RateLimiting");
+
+        // Default behaviour: rate limiting is disabled in Development (to allow
+        // feature/usage testing) and enabled in all other environments. This can
+        // be overridden explicitly via the RateLimiting:Enabled configuration key.
+        _enabled = section.GetValue<bool?>("Enabled") ?? !environment.IsDevelopment();
+
+        // Allow per-endpoint limits to be tuned via configuration, falling back to
+        // the secure defaults when not specified.
+        _rateLimitRules = new Dictionary<string, RateLimitRule>(DefaultRateLimitRules);
+        var rulesSection = section.GetSection("Rules");
+        if (rulesSection.Exists())
+        {
+            foreach (var ruleConfig in rulesSection.GetChildren())
+            {
+                var path = ruleConfig.GetValue<string>("Path");
+                var maxRequests = ruleConfig.GetValue<int?>("MaxRequests");
+                var windowMinutes = ruleConfig.GetValue<int?>("WindowMinutes");
+
+                if (!string.IsNullOrWhiteSpace(path) && maxRequests.HasValue && windowMinutes.HasValue)
+                {
+                    _rateLimitRules[path.ToLower()] = new RateLimitRule
+                    {
+                        MaxRequests = maxRequests.Value,
+                        WindowMinutes = windowMinutes.Value
+                    };
+                }
+            }
+        }
+
+        if (!_enabled)
+        {
+            _logger.LogWarning("Rate limiting is DISABLED. This should only be used in non-production environments.");
+        }
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
+        if (!_enabled)
+        {
+            await _next(context);
+            return;
+        }
+
         var endpoint = context.Request.Path.Value?.ToLower() ?? string.Empty;
         var clientIp = GetClientIpAddress(context);
 
@@ -64,7 +112,7 @@ public class RateLimitingMiddleware
 
     private RateLimitRule? GetRateLimitRule(string endpoint)
     {
-        foreach (var rule in RateLimitRules)
+        foreach (var rule in _rateLimitRules)
         {
             if (endpoint.StartsWith(rule.Key, StringComparison.OrdinalIgnoreCase))
             {

@@ -41,7 +41,23 @@
   },
   "home": {
     "featuredNews": "Featured News",
-    "welcome": "Welcome to Computer Science College"
+    "welcome": "Welcome to Computer Science College",
+    "tagline": "Your gateway to lecture schedules, course materials, grades, and campus life, all in one place.",
+    "getStarted": "Get Started",
+    "explore": "Explore Schedules",
+    "goToDashboard": "Go to Dashboard",
+    "quickAccess": "Quick Access",
+    "quickAccessSubtitle": "Jump straight to what you need",
+    "latestNews": "Latest News",
+    "noNews": "No featured news at the moment",
+    "features": {
+      "schedulesDesc": "View weekly lecture timetables",
+      "materialsDesc": "Download lectures and resources",
+      "gradesDesc": "Check your published results",
+      "activitiesDesc": "Stay updated on campus events",
+      "departmentsDesc": "Explore academic departments",
+      "aboutDesc": "Learn more about the college"
+    }
   },
   "filters": {
     "filterBy": "Filter By",

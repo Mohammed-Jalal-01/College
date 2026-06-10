@@ -618,6 +618,29 @@ const HomePage = () => {
 
 ---
 
+## Home Page (Portal Landing)
+
+**File Location:** `client/src/pages/public/HomePage.jsx`
+
+**Purpose:** Acts as the main entry point for the college portal, guiding visitors and authenticated users to the most relevant sections.
+
+**Layout Sections:**
+- Hero: Gradient banner with the college name, tagline, and role-aware call-to-action buttons.
+  - Guests: "Get Started" (registration) and "Explore Schedules".
+  - Admin/SuperAdmin: "Go to Dashboard" and "Explore Schedules".
+  - Authenticated non-admin: "Explore Schedules".
+- Quick Access grid: Shortcut cards to Schedules, Course Materials, Grades, Activities, Departments, and About, each with an icon and short description.
+- Latest News: Two-column responsive card grid with image (or placeholder), date, title, and excerpt. Admin-only inline add/edit/delete controls are preserved.
+
+**Features:**
+- Fully responsive (1/2/3 column grids depending on breakpoint)
+- Dark mode support across all sections
+- RTL-aware spacing and directional icons
+- All localized via the `home.*` i18n keys (English/Arabic)
+- Role authority preserved: content management actions remain gated behind the `isAdmin` flag
+
+---
+
 ## Future Enhancements
 
 - Implement React Query for server state
