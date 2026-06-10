@@ -1,5 +1,18 @@
 import apiClient from './apiClient';
 
+const normalizeTime = (value) => {
+  if (!value) return value;
+  const parts = value.split(':');
+  if (parts.length === 2) return `${value}:00`;
+  return value;
+};
+
+const normalizePayload = (data) => ({
+  ...data,
+  startTime: normalizeTime(data.startTime),
+  endTime: normalizeTime(data.endTime),
+});
+
 export const schedulesService = {
   getAll: async (filters = {}) => {
     const params = new URLSearchParams();
@@ -17,12 +30,12 @@ export const schedulesService = {
   },
 
   create: async (data) => {
-    const response = await apiClient.post('/lectureschedules', data);
+    const response = await apiClient.post('/lectureschedules', normalizePayload(data));
     return response.data;
   },
 
   update: async (id, data) => {
-    const response = await apiClient.put(`/lectureschedules/${id}`, data);
+    const response = await apiClient.put(`/lectureschedules/${id}`, normalizePayload(data));
     return response.data;
   },
 

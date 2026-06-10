@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Edit, Trash2, X, AlertCircle } from 'lucide-react';
 import { schedulesService } from '../../services/api/schedulesService';
 import { referenceDataService } from '../../services/api/referenceDataService';
 
@@ -13,6 +13,7 @@ const SchedulesManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState(null);
+  const [formError, setFormError] = useState('');
   const [formData, setFormData] = useState({
     branchId: '',
     studyTypeId: '',
@@ -52,6 +53,7 @@ const SchedulesManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError('');
     try {
       if (editingSchedule) {
         await schedulesService.update(editingSchedule.id, formData);
@@ -62,7 +64,13 @@ const SchedulesManagement = () => {
       handleCloseModal();
     } catch (error) {
       console.error('Error saving schedule:', error);
-      alert(error.response?.data?.message || t('common.error'));
+      const data = error.response?.data;
+      let msg = data?.message;
+      if (!msg && data?.errors) {
+        const firstKey = Object.keys(data.errors)[0];
+        msg = data.errors[firstKey]?.[0];
+      }
+      setFormError(msg || t('common.error'));
     }
   };
 
@@ -98,6 +106,7 @@ const SchedulesManagement = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingSchedule(null);
+    setFormError('');
     setFormData({
       branchId: '',
       studyTypeId: '',
@@ -214,6 +223,11 @@ const SchedulesManagement = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              {formError && (
+                <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />{formError}
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

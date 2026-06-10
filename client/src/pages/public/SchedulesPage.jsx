@@ -165,7 +165,13 @@ const SchedulesPage = () => {
       resetForm();
       await fetchSchedules();
     } catch (err) {
-      setError(err.response?.data?.message || t('common.error'));
+      const data = err.response?.data;
+      let msg = data?.message;
+      if (!msg && data?.errors) {
+        const firstKey = Object.keys(data.errors)[0];
+        msg = data.errors[firstKey]?.[0];
+      }
+      setError(msg || t('common.error'));
     } finally {
       setSubmitting(false);
     }

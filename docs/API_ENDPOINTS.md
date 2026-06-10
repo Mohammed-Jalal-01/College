@@ -686,15 +686,54 @@ Get all lecture schedules with optional filtering.
 
 ### POST /api/lectureschedules
 
-Create lecture schedule (Admin/SuperAdmin).
+Create a new lecture schedule entry.
+
+**Authentication:** Required (Admin/SuperAdmin)
+**Authorization Policy:** `AdminOnly`
+
+**Request Body:**
+```json
+{
+  "branchId": "guid",
+  "studyTypeId": "guid",
+  "stageId": "guid",
+  "day": "Monday",
+  "startTime": "08:00:00",
+  "endTime": "10:00:00",
+  "subjectNameEn": "Data Structures",
+  "subjectNameAr": "هياكل بيانات",
+  "instructorName": "Dr. Ali",
+  "roomNumber": "Lab2"
+}
+```
+
+> **Note:** `startTime` and `endTime` must be in `HH:MM:SS` format (`TimeSpan`).
+> The frontend `schedulesService.js` normalizes `HH:MM` from HTML time inputs to `HH:MM:SS` automatically.
+
+**Response:** 201 Created (returns full `LectureScheduleDto`)
 
 ### PUT /api/lectureschedules/{id}
 
-Update lecture schedule (Admin/SuperAdmin).
+Update an existing lecture schedule entry.
+
+**Authentication:** Required (Admin/SuperAdmin)
+**Authorization Policy:** `AdminOnly`
+
+**Request Body:** Same schema as POST.
+
+**Response:** 200 OK (returns updated `LectureScheduleDto`)
 
 ### DELETE /api/lectureschedules/{id}
 
-Delete lecture schedule (Admin/SuperAdmin).
+Delete a lecture schedule entry.
+
+**Authentication:** Required (Admin/SuperAdmin)
+**Authorization Policy:** `AdminOnly`
+
+**Response:** 200 OK
+```json
+{ "message": "Lecture schedule deleted successfully" }
+```
 
 ---
 
