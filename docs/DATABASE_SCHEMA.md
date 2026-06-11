@@ -1,242 +1,415 @@
-# Database Schema - Technical Implementation
+# Database Schema
 
 ## Overview
 
-The College Management System uses PostgreSQL as its relational database, managed through Entity Framework Core with a code-first approach. The schema supports user management, academic content, and audit logging with proper relationships and constraints.
+The College Management System uses PostgreSQL as its relational database, managed through Entity Framework Core (code-first). The database contains **15 tables** organized into four categories: identity, lookup, content, and audit.
 
-## Technical Stack
-
-- Primary technology: PostgreSQL 16.x
+**Technical Stack:**
+- Database: PostgreSQL 16.x
 - ORM: Entity Framework Core 8.0
-- Migration tool: EF Core Migrations
-- Connection: Npgsql provider
+- Provider: Npgsql
+- Approach: Code-first with EF Migrations
 
-## Database Context
+**Database Name:** `ComputerScienceCollege`
 
-**File Location:** `server/Data/ApplicationDbContext.cs`
+---
 
-The ApplicationDbContext inherits from DbContext and defines all entity sets and their relationships.
+## Table Summary
+
+| # | Table | Category | Records (Seed) | Description |
+|---|-------|----------|----------------|-------------|
+| 1 | Users | Identity | 33 (pre-provisioned) | All system users |
+| 2 | Students | Identity | 24 | Extended student profile |
+| 3 | Faculties | Identity | 7 | Extended faculty profile |
+| 4 | Branches | Lookup | 6 (seeded) | Academic branches/departments |
+| 5 | StudyTypes | Lookup | 4 (seeded) | Study type classifications |
+| 6 | Stages | Lookup | 4 (seeded) | Academic year stages |
+| 7 | News | Content | Dynamic | College news articles |
+| 8 | Updates | Content | Dynamic | College updates/announcements |
+| 9 | Activities | Content | Dynamic | College activities/events |
+| 10 | Departments | Content | Dynamic | Academic departments |
+| 11 | LectureSchedules | Academic | Dynamic | Weekly lecture timetable |
+| 12 | CourseMaterials | Academic | Dynamic | Uploaded study materials |
+| 13 | Grades | Academic | Dynamic | Uploaded grade sheets |
+| 14 | AboutCollege | Content | 1 | About page content |
+| 15 | AuditLogs | Audit | Dynamic | Action audit trail |
+
+---
+
+## Table Definitions
+
+### 1. Users
+
+The central identity table. Every person in the system has one User record.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Primary key |
+| DisplayId | varchar(20) | Required, Unique Index | Human-readable ID (e.g. ABC123) |
+| ProfileName | varchar(100) | Required | Display name |
+| Email | varchar(255) | Required, Unique Index | Login email |
+| PasswordHash | text | Required | BCrypt hash |
+| UserType | varchar(20) | Required | "Student" or "Faculty" |
+| Role | varchar(20) | Required, Default "Regular" | "Regular", "Admin", or "SuperAdmin" |
+| CreatedAt | timestamp | UTC | Registration time |
+| UpdatedAt | timestamp | UTC | Last profile update |
+
+**Entity file:** `server/Models/Entities/User.cs`
+
+---
+
+### 2. Students
+
+Extended profile for users with UserType = "Student". One-to-one with Users.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Primary key |
+| UserId | uuid | FK -> Users.Id, Unique | Owner user |
+| Gender | varchar(20) | Required | "Male" or "Female" |
+| BranchId | uuid | FK -> Branches.Id, Required | Academic branch |
+| StudyTypeId | uuid | FK -> StudyTypes.Id, Required | Study classification |
+| StageId | uuid | FK -> Stages.Id, Required | Academic year |
+
+**Cascade behavior:**
+- Deleting a User cascades to its Student record
+- Deleting a Branch/StudyType/Stage cascades to referencing Students
+
+**Entity file:** `server/Models/Entities/Student.cs`
+
+---
+
+### 3. Faculties
+
+Extended profile for users with UserType = "Faculty". One-to-one with Users.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Primary key |
+| UserId | uuid | FK -> Users.Id, Unique | Owner user |
+| Department | varchar(100) | Nullable | Department affiliation |
+| Position | varchar(100) | Nullable | Academic position |
+
+**Entity file:** `server/Models/Entities/Faculty.cs`
+
+---
+
+### 4. Branches (Seeded Lookup)
+
+Academic specialization branches. Data is seeded with **fixed GUIDs** (never regenerated).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Fixed GUID |
+| NameEn | varchar(100) | Required | English name |
+| NameAr | varchar(100) | Required | Arabic name |
+
+**Seeded values:**
+
+| GUID | English | Arabic |
+|------|---------|--------|
+| ca4c3f51-... | Software Engineering | هندسة البرمجيات |
+| ae1e2c9d-... | Cyber Security | الأمن السيبراني |
+| 768906fa-... | Information Systems | نظم المعلومات |
+| 3dd5318c-... | Artificial Intelligence | الذكاء الاصطناعي |
+| 8d38e498-... | Network Engineering | هندسة الشبكات |
+| e2d38afb-... | Multimedia | الوسائط المتعددة |
+
+**Entity file:** `server/Models/Entities/Branch.cs`
+
+---
+
+### 5. StudyTypes (Seeded Lookup)
+
+Study type classifications.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Fixed GUID |
+| NameEn | varchar(100) | Required | English name |
+| NameAr | varchar(100) | Required | Arabic name |
+
+**Seeded values:**
+
+| GUID | English | Arabic |
+|------|---------|--------|
+| cbe76733-... | All Types | جميع الانواع |
+| 5593fee1-... | Morning | صباحي |
+| 85cf43fa-... | Evening | مسائي |
+| e252fd78-... | Parallel | موازي |
+
+**Entity file:** `server/Models/Entities/StudyType.cs`
+
+---
+
+### 6. Stages (Seeded Lookup)
+
+Academic year stages (1-4).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Fixed GUID |
+| NameEn | varchar(100) | Required | English name |
+| NameAr | varchar(100) | Required | Arabic name |
+| StageNumber | int | Required | Numeric order (1-4) |
+
+**Seeded values:**
+
+| GUID | English | Arabic | Number |
+|------|---------|--------|--------|
+| de39baf0-... | First Stage | مرحلة اولى | 1 |
+| 363020b9-... | Second Stage | مرحلة ثانية | 2 |
+| 20540370-... | Third Stage | مرحلة ثالثة | 3 |
+| cd57c38a-... | Fourth Stage | مرحلة رابعة | 4 |
+
+**Entity file:** `server/Models/Entities/Stage.cs`
+
+---
+
+### 7. News
+
+College news articles with bilingual content.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Primary key |
+| TitleEn | varchar(200) | Required | English title |
+| TitleAr | varchar(200) | Required | Arabic title |
+| ContentEn | text | Required | English body |
+| ContentAr | text | Required | Arabic body |
+| IsFeatured | boolean | Default false | Show on homepage |
+| ImageUrl | varchar(500) | Nullable | Attached image path |
+| CreatedBy | uuid | FK -> Users.Id | Author |
+| CreatedAt | timestamp | UTC | Creation time |
+| UpdatedAt | timestamp | UTC | Last edit time |
+
+**Entity file:** `server/Models/Entities/News.cs`
+
+---
+
+### 8. Updates
+
+College announcements/updates with bilingual content.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Primary key |
+| TitleEn | varchar(200) | Required | English title |
+| TitleAr | varchar(200) | Required | Arabic title |
+| ContentEn | text | Required | English body |
+| ContentAr | text | Required | Arabic body |
+| CreatedBy | uuid | FK -> Users.Id | Author |
+| CreatedAt | timestamp | UTC | Creation time |
+| UpdatedAt | timestamp | UTC | Last edit time |
+
+**Entity file:** `server/Models/Entities/Update.cs`
+
+---
+
+### 9. Activities
+
+College activities/events with bilingual content.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Primary key |
+| TitleEn | varchar(200) | Required | English title |
+| TitleAr | varchar(200) | Required | Arabic title |
+| ContentEn | text | Required | English body |
+| ContentAr | text | Required | Arabic body |
+| Date | timestamp | Required | Activity date |
+| ImageUrl | varchar(500) | Nullable | Attached image path |
+| CreatedBy | uuid | FK -> Users.Id | Author |
+| CreatedAt | timestamp | UTC | Creation time |
+| UpdatedAt | timestamp | UTC | Last edit time |
+
+**Entity file:** `server/Models/Entities/Activity.cs`
+
+---
+
+### 10. Departments
+
+Academic departments (name only, no descriptions).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Primary key |
+| NameEn | varchar(200) | Required | English name |
+| NameAr | varchar(200) | Required | Arabic name |
+| CreatedBy | uuid | FK -> Users.Id | Creator |
+| CreatedAt | timestamp | UTC | Creation time |
+| UpdatedAt | timestamp | UTC | Last edit time |
+
+**Entity file:** `server/Models/Entities/Department.cs`
+
+---
+
+### 11. LectureSchedules
+
+Weekly lecture timetable entries, filtered by branch/studyType/stage.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Primary key |
+| BranchId | uuid | FK -> Branches.Id, Required | Target branch |
+| StudyTypeId | uuid | FK -> StudyTypes.Id, Required | Target study type |
+| StageId | uuid | FK -> Stages.Id, Required | Target stage |
+| Day | varchar(20) | Required | Day of week (e.g. "Monday") |
+| StartTime | time | Required | Lecture start time |
+| EndTime | time | Required | Lecture end time |
+| SubjectNameEn | varchar(200) | Required | Subject in English |
+| SubjectNameAr | varchar(200) | Required | Subject in Arabic |
+| InstructorName | varchar(100) | Required | Instructor name |
+| RoomNumber | varchar(50) | Nullable | Room/hall number |
+| CreatedBy | uuid | FK -> Users.Id | Creator |
+| CreatedAt | timestamp | UTC | Creation time |
+| UpdatedAt | timestamp | UTC | Last edit time |
+
+**Entity file:** `server/Models/Entities/LectureSchedule.cs`
+
+---
+
+### 12. CourseMaterials
+
+Uploaded study materials (PDFs, documents), filtered by branch/studyType/stage.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Primary key |
+| BranchId | uuid | FK -> Branches.Id, Required | Target branch |
+| StudyTypeId | uuid | FK -> StudyTypes.Id, Required | Target study type |
+| StageId | uuid | FK -> Stages.Id, Required | Target stage |
+| Course | varchar(20) | Required | Course identifier |
+| TitleEn | varchar(200) | Required | English title |
+| TitleAr | varchar(200) | Required | Arabic title |
+| DescriptionEn | text | Nullable | English description |
+| DescriptionAr | text | Nullable | Arabic description |
+| FileUrl | varchar(500) | Required | Uploaded file path |
+| FileType | varchar(50) | Required | MIME type |
+| UploadedBy | uuid | FK -> Users.Id | Uploader |
+| CreatedAt | timestamp | UTC | Upload time |
+| UpdatedAt | timestamp | UTC | Last edit time |
+
+**Entity file:** `server/Models/Entities/CourseMaterial.cs`
+
+---
+
+### 13. Grades
+
+Uploaded grade sheets, filtered by branch/studyType/stage.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Primary key |
+| SubjectName | varchar(200) | Required | Subject name |
+| BranchId | uuid | FK -> Branches.Id, Required | Target branch |
+| StudyTypeId | uuid | FK -> StudyTypes.Id, Required | Target study type |
+| StageId | uuid | FK -> Stages.Id, Required | Target stage |
+| FileUrl | varchar(500) | Required | Uploaded file path |
+| FileType | varchar(50) | Required | MIME type |
+| OriginalFileName | varchar(255) | Required | Original upload filename |
+| UploadedBy | uuid | FK -> Users.Id | Uploader |
+| CreatedAt | timestamp | UTC | Upload time |
+| UpdatedAt | timestamp | UTC | Last edit time |
+
+**Entity file:** `server/Models/Entities/Grade.cs`
+
+---
+
+### 14. AboutCollege
+
+Singleton-like table for the "About" page content.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Primary key |
+| ContentEn | text | Required | English content |
+| ContentAr | text | Required | Arabic content |
+| ImageUrl | varchar(500) | Nullable | Header image path |
+| UpdatedBy | uuid | FK -> Users.Id | Last editor |
+| CreatedAt | timestamp | UTC | Creation time |
+| UpdatedAt | timestamp | UTC | Last edit time |
+
+**Entity file:** `server/Models/Entities/AboutCollege.cs`
+
+---
+
+### 15. AuditLogs
+
+Tracks user actions for security and accountability.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| Id | uuid | PK | Primary key |
+| UserId | uuid | FK -> Users.Id, Required | Acting user |
+| Action | varchar(100) | Required | Action performed (e.g. "Create", "Update") |
+| EntityType | varchar(100) | Required | Target entity type |
+| EntityId | uuid | Nullable | Target entity ID |
+| Timestamp | timestamp | UTC | When action occurred |
+| Details | text | Nullable | JSON details/diff |
+
+**Entity file:** `server/Models/Entities/AuditLog.cs`
+
+---
+
+## Relationships Diagram
+
+```
+Users
+ |
+ |-- 1:0..1 --> Students --> Branches (N:1, CASCADE)
+ |                      |--> StudyTypes (N:1, CASCADE)
+ |                      |--> Stages (N:1, CASCADE)
+ |
+ |-- 1:0..1 --> Faculties
+ |
+ |-- 1:N ----> News (CreatedBy)
+ |-- 1:N ----> Updates (CreatedBy)
+ |-- 1:N ----> Activities (CreatedBy)
+ |-- 1:N ----> Departments (CreatedBy)
+ |-- 1:N ----> LectureSchedules (CreatedBy)
+ |-- 1:N ----> CourseMaterials (UploadedBy)
+ |-- 1:N ----> Grades (UploadedBy)
+ |-- 1:N ----> AboutCollege (UpdatedBy)
+ |-- 1:N ----> AuditLogs (UserId)
+
+Branches (Lookup)
+ |-- 1:N --> Students (CASCADE)
+ |-- 1:N --> LectureSchedules (CASCADE)
+ |-- 1:N --> CourseMaterials (CASCADE)
+ |-- 1:N --> Grades (CASCADE)
+
+StudyTypes (Lookup)
+ |-- 1:N --> Students (CASCADE)
+ |-- 1:N --> LectureSchedules (CASCADE)
+ |-- 1:N --> CourseMaterials (CASCADE)
+ |-- 1:N --> Grades (CASCADE)
+
+Stages (Lookup)
+ |-- 1:N --> Students (CASCADE)
+ |-- 1:N --> LectureSchedules (CASCADE)
+ |-- 1:N --> CourseMaterials (CASCADE)
+ |-- 1:N --> Grades (CASCADE)
+```
+
+---
+
+## Fluent API Configuration
 
 ```csharp
-public class ApplicationDbContext : DbContext
-{
-    public DbSet<User> Users { get; set; }
-    public DbSet<Student> Students { get; set; }
-    public DbSet<Faculty> Faculties { get; set; }
-    public DbSet<Branch> Branches { get; set; }
-    public DbSet<StudyType> StudyTypes { get; set; }
-    public DbSet<Stage> Stages { get; set; }
-    public DbSet<News> News { get; set; }
-    public DbSet<Update> Updates { get; set; }
-    public DbSet<Activity> Activities { get; set; }
-    public DbSet<Department> Departments { get; set; }
-    public DbSet<LectureSchedule> LectureSchedules { get; set; }
-    public DbSet<CourseMaterial> CourseMaterials { get; set; }
-    public DbSet<Grade> Grades { get; set; }
-    public DbSet<AboutCollege> AboutCollege { get; set; }
-    public DbSet<AuditLog> AuditLogs { get; set; }
-}
-```
+// server/Data/ApplicationDbContext.cs
 
-## Entity Relationship Diagram
+// Unique indexes
+modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+modelBuilder.Entity<User>().HasIndex(u => u.DisplayId).IsUnique();
 
-```
-User (Core Entity)
-├── Id: Guid (PK)
-├── DisplayId: string(20) [Unique Index]
-├── ProfileName: string(100)
-├── Email: string(255) [Unique Index]
-├── PasswordHash: string
-├── UserType: string(20) [Student|Faculty]
-├── Role: string(20) [Regular|Admin|SuperAdmin]
-├── CreatedAt: DateTime
-├── UpdatedAt: DateTime
-└── Relationships:
-    ├── HasOne: Student (1:0..1, Cascade Delete)
-    └── HasOne: Faculty (1:0..1, Cascade Delete)
-
-Student
-├── Id: Guid (PK)
-├── UserId: Guid (FK → User.Id) [Unique]
-├── Gender: string(20)
-├── BranchId: Guid (FK → Branch.Id)
-├── StudyTypeId: Guid (FK → StudyType.Id)
-├── StageId: Guid (FK → Stage.Id)
-└── Relationships:
-    ├── BelongsTo: User (1:1)
-    ├── BelongsTo: Branch (N:1)
-    ├── BelongsTo: StudyType (N:1)
-    └── BelongsTo: Stage (N:1)
-
-Faculty
-├── Id: Guid (PK)
-├── UserId: Guid (FK → User.Id) [Unique]
-└── Relationships:
-    └── BelongsTo: User (1:1)
-
-Branch (Lookup Table)
-├── Id: Guid (PK)
-├── NameEn: string(100)
-├── NameAr: string(100)
-└── Relationships:
-    └── HasMany: Students
-
-StudyType (Lookup Table)
-├── Id: Guid (PK)
-├── NameEn: string(100)
-├── NameAr: string(100)
-└── Relationships:
-    └── HasMany: Students
-
-Stage (Lookup Table)
-├── Id: Guid (PK)
-├── NameEn: string(100)
-├── NameAr: string(100)
-├── StageNumber: int
-└── Relationships:
-    └── HasMany: Students
-
-News (Content Entity)
-├── Id: Guid (PK)
-├── TitleEn: string(200)
-├── TitleAr: string(200)
-├── ContentEn: string
-├── ContentAr: string
-├── ImageUrl: string(500)
-├── IsFeatured: bool
-├── PublishedAt: DateTime
-└── CreatedAt: DateTime
-
-Update (Content Entity)
-├── Id: Guid (PK)
-├── TitleEn: string(200)
-├── TitleAr: string(200)
-├── ContentEn: string
-├── ContentAr: string
-├── PublishedAt: DateTime
-└── CreatedAt: DateTime
-
-Activity (Content Entity)
-├── Id: Guid (PK)
-├── TitleEn: string(200)
-├── TitleAr: string(200)
-├── DescriptionEn: string
-├── DescriptionAr: string
-├── ImageUrl: string(500)
-├── ActivityDate: DateTime
-└── CreatedAt: DateTime
-
-Department (Content Entity)
-├── Id: Guid (PK)
-├── NameEn: string(200)
-├── NameAr: string(200)
-├── DescriptionEn: string
-├── DescriptionAr: string
-└── CreatedAt: DateTime
-
-LectureSchedule (Academic Entity)
-├── Id: Guid (PK)
-├── SubjectEn: string(200)
-├── SubjectAr: string(200)
-├── InstructorEn: string(100)
-├── InstructorAr: string(100)
-├── DayOfWeek: string(20)
-├── StartTime: TimeSpan
-├── EndTime: TimeSpan
-├── RoomEn: string(50)
-├── RoomAr: string(50)
-├── BranchId: Guid (FK → Branch.Id, Nullable)
-├── StudyTypeId: Guid (FK → StudyType.Id, Nullable)
-├── StageId: Guid (FK → Stage.Id, Nullable)
-└── CreatedAt: DateTime
-
-CourseMaterial (Academic Entity)
-├── Id: Guid (PK)
-├── TitleEn: string(200)
-├── TitleAr: string(200)
-├── DescriptionEn: string
-├── DescriptionAr: string
-├── FileUrl: string(500)
-├── FileName: string(255)
-├── FileSize: long
-├── BranchId: Guid (FK → Branch.Id, Nullable)
-├── StudyTypeId: Guid (FK → StudyType.Id, Nullable)
-├── StageId: Guid (FK → Stage.Id, Nullable)
-├── UploadedAt: DateTime
-└── CreatedAt: DateTime
-
-Grade (Academic Entity)
-├── Id: Guid (PK)
-├── SubjectName: string(200)
-├── BranchId: Guid (FK → Branch.Id)
-├── StudyTypeId: Guid (FK → StudyType.Id)
-├── StageId: Guid (FK → Stage.Id)
-├── FileUrl: string(500)
-├── FileType: string(50)
-├── OriginalFileName: string(255)
-├── UploadedBy: Guid (FK → User.Id)
-├── CreatedAt: DateTime
-├── UpdatedAt: DateTime
-└── Relationships:
-    ├── BelongsTo: Branch (N:1)
-    ├── BelongsTo: StudyType (N:1)
-    ├── BelongsTo: Stage (N:1)
-    └── BelongsTo: User (N:1, UploadedByUser)
-
-AboutCollege (Content Entity)
-├── Id: Guid (PK)
-├── ContentEn: string
-├── ContentAr: string
-├── UpdatedAt: DateTime
-└── CreatedAt: DateTime
-
-AuditLog (Audit Entity)
-├── Id: Guid (PK)
-├── UserId: Guid (Nullable)
-├── Action: string(100)
-├── EntityName: string(100)
-├── EntityId: string(100)
-├── Changes: string
-├── IpAddress: string(50)
-├── UserAgent: string(500)
-└── Timestamp: DateTime
-```
-
-## Unique Constraints and Indexes
-
-### User Table
-```csharp
-// ApplicationDbContext.cs:32-38
-modelBuilder.Entity<User>()
-    .HasIndex(u => u.Email)
-    .IsUnique();
-
-modelBuilder.Entity<User>()
-    .HasIndex(u => u.DisplayId)
-    .IsUnique();
-```
-
-**Purpose:**
-- Email uniqueness: Prevents duplicate user registrations
-- DisplayId uniqueness: Ensures each user has a unique searchable identifier
-
-## Foreign Key Relationships
-
-### User-Student Relationship (One-to-One)
-```csharp
-// ApplicationDbContext.cs:40-44
+// One-to-one relationships with cascade delete
 modelBuilder.Entity<User>()
     .HasOne(u => u.Student)
     .WithOne(s => s.User)
     .HasForeignKey<Student>(s => s.UserId)
     .OnDelete(DeleteBehavior.Cascade);
-```
 
-**Cascade Delete:** When a User is deleted, their Student record is automatically deleted.
-
-### User-Faculty Relationship (One-to-One)
-```csharp
-// ApplicationDbContext.cs:46-50
 modelBuilder.Entity<User>()
     .HasOne(u => u.Faculty)
     .WithOne(f => f.User)
@@ -244,200 +417,61 @@ modelBuilder.Entity<User>()
     .OnDelete(DeleteBehavior.Cascade);
 ```
 
-**Cascade Delete:** When a User is deleted, their Faculty record is automatically deleted.
+All other foreign key relationships use EF Core convention-based cascade delete (required FKs default to CASCADE).
 
-## Seeded Data
+---
 
-### Branches (6 records)
-```csharp
-// ApplicationDbContext.cs:57-65
-- Software Engineering (هندسة البرمجيات)
-- Cyber Security (الأمن السيبراني)
-- Information Systems (نظم المعلومات)
-- Artificial Intelligence (الذكاء الاصطناعي)
-- Network Engineering (هندسة الشبكات)
-- Multimedia (الوسائط المتعددة)
-```
+## Seed Data
 
-### Study Types (4 records)
-```csharp
-// ApplicationDbContext.cs:67-73
-- All Types (جميع الانواع)
-- Morning (صباحي)
-- Evening (مسائي)
-- Parallel (موازي)
-```
+Seed data uses **fixed GUIDs** (via `Guid.Parse(...)`) to prevent accidental cascade deletion during migrations. Never use `Guid.NewGuid()` in seed data.
 
-### Stages (4 records)
-```csharp
-// ApplicationDbContext.cs:75-81
-- First Stage (مرحلة اولى) - StageNumber: 1
-- Second Stage (مرحلة ثانية) - StageNumber: 2
-- Third Stage (مرحلة ثالثة) - StageNumber: 3
-- Fourth Stage (مرحلة رابعة) - StageNumber: 4
-```
+**Source:** `server/Data/ApplicationDbContext.cs` (SeedData method)
+
+---
 
 ## Migration History
 
-**Location:** `server/Migrations/`
+| # | File | Purpose |
+|---|------|---------|
+| 1 | `20260208173542_InitialCreate.cs` | Creates all 15 tables with relationships and seed data |
+| 2 | `20260209121006_AddDisplayIdToUser.cs` | Adds DisplayId column with unique index |
+| 3 | `20260611025156_RemoveDepartmentDescriptionFields.cs` | Drops DescriptionEn/DescriptionAr from Departments |
+| 4 | `20260611045335_RestoreStudentRecords.cs` | Restores Student records lost to cascade delete; fixes seed GUIDs |
 
-### Initial Migration
-- **File:** `20260208173542_InitialCreate.cs`
-- **Purpose:** Creates all tables, relationships, and seeded data
-- **Tables Created:** 14 tables (Users, Students, Faculties, Branches, StudyTypes, Stages, News, Updates, Activities, Departments, LectureSchedules, CourseMaterials, AboutCollege, AuditLogs)
-
-### Display ID Migration
-- **File:** `20260209121006_AddDisplayIdToUser.cs`
-- **Purpose:** Adds DisplayId field to User table with unique index
-- **Changes:** Added DisplayId column, created unique index
-
-## Repository Pattern Implementation
-
-**Interface:** `server/Repositories/IUserRepository.cs`
-**Implementation:** `server/Repositories/UserRepository.cs`
-
-The repository pattern abstracts data access logic from business logic.
-
-```csharp
-public interface IUserRepository
-{
-    Task<User?> GetByIdAsync(Guid id);
-    Task<User?> GetByEmailAsync(string email);
-    Task<IEnumerable<User>> GetAllAsync();
-    Task<User> CreateAsync(User user);
-    Task<bool> UpdateAsync(User user);
-    Task<bool> DeleteAsync(Guid id);
-    Task<Student?> GetStudentByUserIdAsync(Guid userId);
-    Task<Student> CreateStudentAsync(Student student);
-    Task<Faculty> CreateFacultyAsync(Faculty faculty);
-}
-```
+---
 
 ## Connection Configuration
 
-**File:** `server/appsettings.template.json`
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "REPLACE_WITH_USER_SECRETS"
-  }
-}
+```
+Host=localhost;Database=ComputerScienceCollege;Username=<user>;Password=<password>
 ```
 
-**Actual Connection String Format:**
-```
-Host=localhost;Database=ComputerScienceCollege;Username=your_username;Password=your_password
-```
+Stored in .NET User Secrets (never committed). Template at `server/appsettings.template.json`.
 
-**Configuration in Program.cs:**
-```csharp
-// Program.cs:22-23
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-```
-
-## Data Types and Constraints
-
-### String Length Constraints
-- DisplayId: 20 characters (short, unique identifier)
-- Email: 255 characters (standard email length)
-- ProfileName: 100 characters
-- UserType/Role: 20 characters
-- Titles (En/Ar): 200 characters
-- Content fields: Unlimited (text type in PostgreSQL)
-
-### DateTime Fields
-- All timestamps use UTC (DateTime.UtcNow)
-- CreatedAt: Set on entity creation
-- UpdatedAt: Updated on entity modification
-
-### Nullable Fields
-- Student/Faculty navigation properties (User may not have extended profile)
-- BranchId/StudyTypeId/StageId in LectureSchedule and CourseMaterial (allows "All" filtering)
-- UserId in AuditLog (allows system-level actions)
-
-## Performance Considerations
-
-### Indexed Fields
-- User.Email (unique index for fast lookups during login)
-- User.DisplayId (unique index for user search functionality)
-
-### Eager Loading
-```csharp
-// UserRepository.cs:18-21
-return await _context.Users
-    .Include(u => u.Student)
-    .Include(u => u.Faculty)
-    .FirstOrDefaultAsync(u => u.Id == id);
-```
-
-### Lazy Loading
-Not enabled - all related data must be explicitly included to avoid N+1 query problems.
-
-## Code References
-
-**Backend:**
-- DbContext: `server/Data/ApplicationDbContext.cs:6-87`
-- User Entity: `server/Models/Entities/User.cs:6-41`
-- Student Entity: `server/Models/Entities/Student.cs:6-35`
-- Faculty Entity: `server/Models/Entities/Faculty.cs`
-- Repository Interface: `server/Repositories/IUserRepository.cs:5-16`
-- Repository Implementation: `server/Repositories/UserRepository.cs:7-85`
-- Initial Migration: `server/Migrations/20260208173542_InitialCreate.cs`
-- DisplayId Migration: `server/Migrations/20260209121006_AddDisplayIdToUser.cs`
+---
 
 ## Database Commands
 
-### Create Migration
 ```bash
-dotnet ef migrations add MigrationName
-```
+# Create a new migration
+dotnet ef migrations add <Name>
 
-### Apply Migrations
-```bash
+# Apply all pending migrations
 dotnet ef database update
-```
 
-### Rollback Migration
-```bash
-dotnet ef database update PreviousMigrationName
-```
+# Rollback to a specific migration
+dotnet ef database update <MigrationName>
 
-### Remove Last Migration
-```bash
+# Remove the last unapplied migration
 dotnet ef migrations remove
 ```
 
-## Testing Considerations
+---
 
-**Key Test Scenarios:**
-1. User creation with unique email and DisplayId
-2. Cascade delete behavior (User → Student/Faculty)
-3. Foreign key constraint validation
-4. Unique constraint violations
-5. Seeded data availability
+## Security Notes
 
-**Edge Cases:**
-- Duplicate email registration attempts
-- Duplicate DisplayId generation (handled by DisplayIdGenerator)
-- Orphaned Student/Faculty records (prevented by cascade delete)
-- Null foreign keys in optional relationships
-
-## Security Considerations
-
-- PasswordHash is never exposed in DTOs
-- Email addresses are case-insensitive (handled at application level)
-- Soft delete not implemented (hard delete with cascade)
-- Audit logging tracks all data modifications
-- No direct database access from frontend
-
-## Future Enhancements
-
-- Implement soft delete for User entities
-- Add composite indexes for frequently queried combinations (Branch + StudyType + Stage)
-- Implement database-level audit triggers
-- Add full-text search indexes for content fields
-- Consider partitioning AuditLog table by date for performance
-- Implement database connection pooling optimization
-- Add read replicas for reporting queries
+- PasswordHash is never exposed in API responses
+- Connection string stored in User Secrets, not in source control
+- All foreign keys use cascade delete (no orphaned records)
+- Audit logging tracks modifications for accountability
+- Registration is closed; no new accounts can be created via API

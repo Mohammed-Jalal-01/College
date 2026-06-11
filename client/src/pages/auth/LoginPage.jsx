@@ -154,14 +154,8 @@ const LoginPage = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600 dark:text-gray-400">
-              {t('auth.dontHaveAccount')}{' '}
-              <button
-                onClick={() => navigate('/auth/account-type')}
-                className="text-primary-600 dark:text-primary-400 hover:underline font-medium"
-              >
-                {t('auth.registerHere')}
-              </button>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t('auth.registrationClosedMessage')}
             </p>
           </div>
         </div>

@@ -20,24 +20,10 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+    public IActionResult Register([FromBody] RegisterDto registerDto)
     {
-        try
-        {
-            var response = await _authService.RegisterAsync(registerDto);
-            _logger.LogInformation("User registered successfully: {Email}", registerDto.Email);
-            return Ok(response);
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogWarning("Registration failed: {Message}", ex.Message);
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error during registration");
-            return StatusCode(500, new { message = "An error occurred during registration" });
-        }
+        _logger.LogWarning("Registration attempt rejected (closed): {Email}", registerDto.Email);
+        return StatusCode(403, new { message = "Registration is currently closed. All available accounts have been provisioned." });
     }
 
     [HttpPost("login")]

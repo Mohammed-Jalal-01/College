@@ -37,7 +37,10 @@
     "submit": "Submit",
     "continue": "Continue",
     "deleteAccount": "Delete Account",
-    "deleteAccountConfirm": "Are you sure you want to delete your account? This action cannot be undone."
+    "deleteAccountConfirm": "Are you sure you want to delete your account? This action cannot be undone.",
+    "registrationClosed": "Registration Closed",
+    "registrationClosedMessage": "Registration is currently closed. All available accounts have been provisioned. If you already have an account, please log in.",
+    "goToLogin": "Go to Login"
   },
   "home": {
     "featuredNews": "Featured News",

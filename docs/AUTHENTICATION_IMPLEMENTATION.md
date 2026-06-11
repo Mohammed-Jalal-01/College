@@ -199,83 +199,21 @@ public class LoginAttemptService : ILoginAttemptService
 
 ### User Registration Flow
 
-**AuthService.cs RegisterAsync Method:**
+**Status: CLOSED**
+
+Registration is permanently disabled. All accounts have been pre-provisioned (see `TEST_ACCOUNTS.md`). The endpoint exists but immediately returns 403 Forbidden.
 
 ```csharp
-// server/Services/AuthService.cs:23-83
-public async Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto)
+// server/Controllers/AuthController.cs:22-27
+[HttpPost("register")]
+public IActionResult Register([FromBody] RegisterDto registerDto)
 {
-    // 1. Check email uniqueness
-    var existingUser = await _userRepository.GetByEmailAsync(registerDto.Email);
-    if (existingUser != null)
-    {
-        throw new InvalidOperationException("Email already exists");
-    }
-
-    // 2. Validate user type
-    if (registerDto.UserType != "Student" && registerDto.UserType != "Faculty")
-    {
-        throw new InvalidOperationException("Invalid user type");
-    }
-
-    // 3. Validate password strength
-    var passwordValidation = PasswordValidator.ValidatePassword(registerDto.Password);
-    if (!passwordValidation.IsValid)
-    {
-        throw new InvalidOperationException(
-            $"Password validation failed: {string.Join(", ", passwordValidation.Errors)}");
-    }
-
-    // 4. Hash password
-    var passwordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
-    
-    // 5. Generate unique display ID
-    var displayId = await _displayIdGenerator.GenerateUniqueDisplayIdAsync();
-
-    // 6. Create user entity
-    var user = new User
-    {
-        Id = Guid.NewGuid(),
-        DisplayId = displayId,
-        ProfileName = registerDto.ProfileName,
-        Email = registerDto.Email,
-        PasswordHash = passwordHash,
-        UserType = registerDto.UserType,
-        Role = "Regular",
-        CreatedAt = DateTime.UtcNow,
-        UpdatedAt = DateTime.UtcNow
-    };
-
-    await _userRepository.CreateAsync(user);
-
-    // 7. Create Faculty record if applicable
-    if (registerDto.UserType == "Faculty")
-    {
-        var faculty = new Faculty
-        {
-            Id = Guid.NewGuid(),
-            UserId = user.Id
-        };
-        await _userRepository.CreateFacultyAsync(faculty);
-    }
-
-    // 8. Generate JWT token
-    var token = _tokenService.GenerateToken(user);
-
-    // 9. Return auth response
-    return new AuthResponseDto
-    {
-        Token = token,
-        Email = user.Email,
-        ProfileName = user.ProfileName,
-        DisplayId = user.DisplayId,
-        UserType = user.UserType,
-        Role = user.Role,
-        UserId = user.Id,
-        RequiresStudentInfo = registerDto.UserType == "Student"
-    };
+    _logger.LogWarning("Registration attempt rejected (closed): {Email}", registerDto.Email);
+    return StatusCode(403, new { message = "Registration is currently closed. All available accounts have been provisioned." });
 }
 ```
+
+The `AuthService.RegisterAsync` method is retained in the codebase for reference but is never called. The frontend displays a "Registration Closed" notice on both the register page and the login page.
 
 ### User Login Flow
 

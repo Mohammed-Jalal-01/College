@@ -38,40 +38,18 @@ Authorization: Bearer <jwt_token>
 
 ### POST /api/auth/register
 
-Register a new user account.
+**Status: CLOSED** - Registration is permanently disabled. All accounts have been pre-provisioned.
 
 **Authentication:** Not Required
 
-**Request Body:**
+**Response:** 403 Forbidden
 ```json
 {
-  "profileName": "string (max 100)",
-  "email": "string (valid email, max 255)",
-  "password": "string (min 8, complex)",
-  "confirmPassword": "string",
-  "userType": "Student" | "Faculty"
+  "message": "Registration is currently closed. All available accounts have been provisioned."
 }
 ```
 
-**Response:** 200 OK
-```json
-{
-  "token": "jwt_token_string",
-  "email": "user@example.com",
-  "profileName": "User Name",
-  "displayId": "ABC123",
-  "userType": "Student",
-  "role": "Regular",
-  "userId": "guid",
-  "requiresStudentInfo": true
-}
-```
-
-**Error Responses:**
-- 400: Email already exists, Invalid user type, Password validation failed
-- 500: Internal server error
-
-**File Location:** `server/Controllers/AuthController.cs:22-41`
+**File Location:** `server/Controllers/AuthController.cs:22-27`
 
 ---
 

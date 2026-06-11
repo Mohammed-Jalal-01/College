@@ -1,276 +1,35 @@
-import { useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useAuth } from '../../contexts/AuthContext'
-import { Eye, EyeOff, Loader2, Check, X as XIcon } from 'lucide-react'
-
-const getPasswordChecks = (password) => ({
-  length: password.length >= 8,
-  uppercase: /[A-Z]/.test(password),
-  lowercase: /[a-z]/.test(password),
-  number: /[0-9]/.test(password),
-  special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
-})
-
-const isPasswordStrong = (password) =>
-  Object.values(getPasswordChecks(password)).every(Boolean)
+import { ShieldAlert } from 'lucide-react'
 
 const RegisterPage = () => {
   const navigate = useNavigate()
-  const location = useLocation()
   const { t } = useTranslation()
-  const { register } = useAuth()
-
-  const userType = location.state?.userType || 'Student'
-
-  const [formData, setFormData] = useState({
-    profileName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    userType: userType,
-  })
-
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [errors, setErrors] = useState({})
-  const [loading, setLoading] = useState(false)
-  const [apiError, setApiError] = useState('')
-
-  const validateForm = () => {
-    const newErrors = {}
-
-    if (!formData.profileName.trim()) {
-      newErrors.profileName = t('validation.required', 'This field is required')
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = t('validation.required', 'This field is required')
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = t('validation.invalidEmail', 'Invalid email address')
-    }
-
-    if (!formData.password) {
-      newErrors.password = t('validation.required', 'This field is required')
-    } else if (!isPasswordStrong(formData.password)) {
-      newErrors.password = t(
-        'validation.passwordRequirements',
-        'Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character'
-      )
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = t('validation.passwordMismatch', 'Passwords do not match')
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setApiError('')
-
-    if (!validateForm()) {
-      return
-    }
-
-    setLoading(true)
-
-    try {
-      const response = await register(formData)
-
-      if (response.requiresStudentInfo) {
-        navigate('/auth/student-info')
-      } else {
-        navigate('/')
-      }
-    } catch (error) {
-      setApiError(error.response?.data?.message || t('error.registration', 'Registration failed. Please try again.'))
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }))
-    }
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
       <div className="max-w-md w-full">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              {t('auth.registerTitle')}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              {userType === 'Student' ? t('auth.student') : t('auth.faculty')}
-            </p>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center">
+              <ShieldAlert className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+            </div>
           </div>
 
-          {apiError && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-red-600 dark:text-red-400 text-sm">{apiError}</p>
-            </div>
-          )}
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            {t('auth.registrationClosed')}
+          </h1>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="profileName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('auth.profileName')}
-              </label>
-              <input
-                type="text"
-                id="profileName"
-                name="profileName"
-                value={formData.profileName}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.profileName
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 dark:border-gray-600 focus:ring-primary-500'
-                } bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:outline-none transition-colors`}
-              />
-              {errors.profileName && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.profileName}</p>
-              )}
-            </div>
+          <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+            {t('auth.registrationClosedMessage')}
+          </p>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('auth.email')}
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.email
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 dark:border-gray-600 focus:ring-primary-500'
-                } bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:outline-none transition-colors`}
-              />
-              {errors.email && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('auth.password')}
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  name="password"
-                  dir="ltr"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 rounded-lg border ${
-                    errors.password
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'border-gray-300 dark:border-gray-600 focus:ring-primary-500'
-                  } bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:outline-none transition-colors`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              {errors.password && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>}
-              {formData.password && (
-                <ul className="mt-3 space-y-1">
-                  {[
-                    { key: 'length', label: t('validation.pwLength', 'At least 8 characters') },
-                    { key: 'uppercase', label: t('validation.pwUppercase', 'One uppercase letter') },
-                    { key: 'lowercase', label: t('validation.pwLowercase', 'One lowercase letter') },
-                    { key: 'number', label: t('validation.pwNumber', 'One number') },
-                    { key: 'special', label: t('validation.pwSpecial', 'One special character') },
-                  ].map((req) => {
-                    const passed = getPasswordChecks(formData.password)[req.key]
-                    return (
-                      <li
-                        key={req.key}
-                        className={`flex items-center gap-2 text-xs ${
-                          passed ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'
-                        }`}
-                      >
-                        {passed ? <Check className="w-3.5 h-3.5" /> : <XIcon className="w-3.5 h-3.5" />}
-                        <span>{req.label}</span>
-                      </li>
-                    )
-                  })}
-                </ul>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('auth.confirmPassword')}
-              </label>
-              <div className="relative">
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  dir="ltr"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 rounded-lg border ${
-                    errors.confirmPassword
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'border-gray-300 dark:border-gray-600 focus:ring-primary-500'
-                  } bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:outline-none transition-colors`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.confirmPassword}</p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>{t('common.loading')}</span>
-                </>
-              ) : (
-                <span>{t('auth.submit')}</span>
-              )}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-600 dark:text-gray-400">
-              {t('auth.alreadyHaveAccount')}{' '}
-              <button
-                onClick={() => navigate('/auth/login')}
-                className="text-primary-600 dark:text-primary-400 hover:underline font-medium"
-              >
-                {t('auth.loginHere')}
-              </button>
-            </p>
-          </div>
+          <button
+            onClick={() => navigate('/auth/login')}
+            className="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
+          >
+            {t('auth.goToLogin')}
+          </button>
         </div>
       </div>
     </div>
