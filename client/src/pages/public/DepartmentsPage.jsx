@@ -76,10 +76,13 @@ const DepartmentsPage = () => {
                 <div className="flex items-center justify-center"><Building2 className="w-12 h-12 text-white" /></div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 text-center">{language === 'ar' ? dept.nameAr : dept.nameEn}</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-center mb-4">{language === 'ar' ? dept.descriptionAr : dept.descriptionEn}</p>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1 text-center">{language === 'ar' ? dept.nameAr : dept.nameEn}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-3">{language === 'ar' ? dept.nameEn : dept.nameAr}</p>
+                {(language === 'ar' ? dept.descriptionAr : dept.descriptionEn) && (
+                  <p className="text-gray-600 dark:text-gray-400 text-center text-sm mb-4 line-clamp-2">{language === 'ar' ? dept.descriptionAr : dept.descriptionEn}</p>
+                )}
                 <div className="flex items-center justify-center text-sm text-gray-500 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <Users className="w-4 h-4 mr-1" /><span>{t('content.departments')}</span>
+                  <Users className="w-4 h-4 mr-1 rtl:ml-1 rtl:mr-0" /><span>{t('content.departments')}</span>
                 </div>
               </div>
             </div>
