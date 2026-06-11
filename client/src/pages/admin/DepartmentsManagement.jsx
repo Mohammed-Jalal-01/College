@@ -13,8 +13,6 @@ const DepartmentsManagement = () => {
   const [formData, setFormData] = useState({
     nameEn: '',
     nameAr: '',
-    descriptionEn: '',
-    descriptionAr: '',
   });
 
   useEffect(() => {
@@ -72,8 +70,6 @@ const DepartmentsManagement = () => {
     setFormData({
       nameEn: department.nameEn,
       nameAr: department.nameAr,
-      descriptionEn: department.descriptionEn,
-      descriptionAr: department.descriptionAr,
     });
     setShowModal(true);
   };
@@ -85,8 +81,6 @@ const DepartmentsManagement = () => {
     setFormData({
       nameEn: '',
       nameAr: '',
-      descriptionEn: '',
-      descriptionAr: '',
     });
   };
 
@@ -116,11 +110,11 @@ const DepartmentsManagement = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {departments.map((dept) => (
           <div key={dept.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
               {i18n.language === 'ar' ? dept.nameAr : dept.nameEn}
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
-              {i18n.language === 'ar' ? dept.descriptionAr : dept.descriptionEn}
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              {i18n.language === 'ar' ? dept.nameEn : dept.nameAr}
             </p>
             <div className="flex justify-end gap-1">
               <button
@@ -187,31 +181,6 @@ const DepartmentsManagement = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('content.descriptionEn')}
-                </label>
-                <textarea
-                  value={formData.descriptionEn}
-                  onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
-                  required
-                  rows="6"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('content.descriptionAr')}
-                </label>
-                <textarea
-                  value={formData.descriptionAr}
-                  onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
-                  required
-                  rows="6"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
 
               <div className="flex justify-end space-x-3 pt-4">
                 <button

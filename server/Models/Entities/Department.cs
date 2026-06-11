@@ -16,12 +16,6 @@ public class Department
     [MaxLength(200)]
     public string NameAr { get; set; } = string.Empty;
 
-    [Required]
-    public string DescriptionEn { get; set; } = string.Empty;
-
-    [Required]
-    public string DescriptionAr { get; set; } = string.Empty;
-
     [ForeignKey("CreatedByUser")]
     public Guid CreatedBy { get; set; }
 

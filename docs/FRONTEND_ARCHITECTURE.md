@@ -671,16 +671,19 @@ const HomePage = () => {
 
 **File Location:** `client/src/pages/public/DepartmentsPage.jsx`
 
+**Data Model:** Departments have only `nameEn` and `nameAr` (no description fields).
+
 **Layout:** Responsive card grid (1 col mobile, 2 col tablet, 3 col desktop). Each department card shows:
 - Primary name in the current interface language (h3, bold)
 - Alternate-language name as subtitle (smaller, gray)
-- Description (if present, truncated to 2 lines)
 - Category footer with icon
 
 **Bilingual Name Display:**
 - Arabic mode: shows `nameAr` as title, `nameEn` as subtitle
 - English mode: shows `nameEn` as title, `nameAr` as subtitle
 - This ensures both language names are always visible regardless of interface language
+
+**Create/Edit Form:** Only two fields: English name and Arabic name.
 
 **Role Authority:**
 - View: available to all users

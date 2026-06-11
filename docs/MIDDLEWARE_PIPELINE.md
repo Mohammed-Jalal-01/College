@@ -605,6 +605,15 @@ builder.Host.UseSerilog();
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+```
+
+**Seed Data (ApplicationDbContext.SeedData):**
+- Branch, StudyType, and Stage reference data is seeded with fixed GUIDs
+- GUIDs MUST remain stable across builds to prevent EF Core from generating Delete+Insert operations in migrations
+- Changing seed GUIDs triggers CASCADE DELETE on Students, CourseMaterials, LectureSchedules, and Grades
+- Never use `Guid.NewGuid()` in seed data; always use `Guid.Parse("...")` with a fixed value
+
+```csharp
 
 // Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

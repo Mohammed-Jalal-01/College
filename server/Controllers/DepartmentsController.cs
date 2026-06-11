@@ -34,8 +34,6 @@ public class DepartmentsController : ControllerBase
                     Id = d.Id,
                     NameEn = d.NameEn,
                     NameAr = d.NameAr,
-                    DescriptionEn = d.DescriptionEn,
-                    DescriptionAr = d.DescriptionAr,
                     CreatedBy = d.CreatedBy,
                     CreatedByName = d.CreatedByUser.ProfileName,
                     CreatedAt = d.CreatedAt,
@@ -65,8 +63,6 @@ public class DepartmentsController : ControllerBase
                     Id = d.Id,
                     NameEn = d.NameEn,
                     NameAr = d.NameAr,
-                    DescriptionEn = d.DescriptionEn,
-                    DescriptionAr = d.DescriptionAr,
                     CreatedBy = d.CreatedBy,
                     CreatedByName = d.CreatedByUser.ProfileName,
                     CreatedAt = d.CreatedAt,
@@ -105,8 +101,6 @@ public class DepartmentsController : ControllerBase
                 Id = Guid.NewGuid(),
                 NameEn = createDepartmentDto.NameEn,
                 NameAr = createDepartmentDto.NameAr,
-                DescriptionEn = createDepartmentDto.DescriptionEn,
-                DescriptionAr = createDepartmentDto.DescriptionAr,
                 CreatedBy = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -125,8 +119,6 @@ public class DepartmentsController : ControllerBase
                     Id = d.Id,
                     NameEn = d.NameEn,
                     NameAr = d.NameAr,
-                    DescriptionEn = d.DescriptionEn,
-                    DescriptionAr = d.DescriptionAr,
                     CreatedBy = d.CreatedBy,
                     CreatedByName = d.CreatedByUser.ProfileName,
                     CreatedAt = d.CreatedAt,
@@ -157,8 +149,6 @@ public class DepartmentsController : ControllerBase
 
             department.NameEn = updateDepartmentDto.NameEn;
             department.NameAr = updateDepartmentDto.NameAr;
-            department.DescriptionEn = updateDepartmentDto.DescriptionEn;
-            department.DescriptionAr = updateDepartmentDto.DescriptionAr;
             department.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -174,8 +164,6 @@ public class DepartmentsController : ControllerBase
                     Id = d.Id,
                     NameEn = d.NameEn,
                     NameAr = d.NameAr,
-                    DescriptionEn = d.DescriptionEn,
-                    DescriptionAr = d.DescriptionAr,
                     CreatedBy = d.CreatedBy,
                     CreatedByName = d.CreatedByUser.ProfileName,
                     CreatedAt = d.CreatedAt,

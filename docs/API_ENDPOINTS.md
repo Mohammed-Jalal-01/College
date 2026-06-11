@@ -625,28 +625,61 @@ Get all departments.
     "id": "guid",
     "nameEn": "Department Name",
     "nameAr": "اسم القسم",
-    "descriptionEn": "Description...",
-    "descriptionAr": "الوصف...",
-    "createdAt": "2024-01-01T00:00:00Z"
+    "createdBy": "guid",
+    "createdByName": "User Name",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
   }
 ]
 ```
 
 ### GET /api/departments/{id}
 
-Get single department.
+Get single department by ID.
+
+**Authentication:** Not Required
+
+**Response:** 200 OK (same schema as above, single object)
 
 ### POST /api/departments
 
-Create department (Admin/SuperAdmin).
+Create a new department.
+
+**Authentication:** Required (Admin/SuperAdmin)
+**Authorization Policy:** `AdminOnly`
+
+**Request Body:**
+```json
+{
+  "nameEn": "Department Name",
+  "nameAr": "اسم القسم"
+}
+```
+
+**Response:** 201 Created (returns full `DepartmentDto`)
 
 ### PUT /api/departments/{id}
 
-Update department (Admin/SuperAdmin).
+Update an existing department.
+
+**Authentication:** Required (Admin/SuperAdmin)
+**Authorization Policy:** `AdminOnly`
+
+**Request Body:** Same schema as POST.
+
+**Response:** 200 OK (returns updated `DepartmentDto`)
 
 ### DELETE /api/departments/{id}
 
-Delete department (Admin/SuperAdmin).
+Delete a department.
+
+**Authentication:** Required (Admin/SuperAdmin)
+**Authorization Policy:** `AdminOnly`
+
+**Response:** 200 OK
+```json
+{ "message": "Department deleted successfully" }
+```
 
 ---
 

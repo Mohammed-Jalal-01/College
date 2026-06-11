@@ -15,7 +15,7 @@ const DepartmentsPage = () => {
   const [editingDept, setEditingDept] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [form, setForm] = useState({ nameEn: '', nameAr: '', descriptionEn: '', descriptionAr: '' })
+  const [form, setForm] = useState({ nameEn: '', nameAr: '' })
 
   useEffect(() => { fetchDepartments() }, [])
 
@@ -24,10 +24,10 @@ const DepartmentsPage = () => {
     catch (err) { console.error('Error fetching departments:', err) } finally { setLoading(false) }
   }
 
-  const resetForm = () => { setForm({ nameEn: '', nameAr: '', descriptionEn: '', descriptionAr: '' }); setEditingDept(null); setShowForm(false); setError('') }
+  const resetForm = () => { setForm({ nameEn: '', nameAr: '' }); setEditingDept(null); setShowForm(false); setError('') }
 
   const handleEdit = (dept) => {
-    setForm({ nameEn: dept.nameEn, nameAr: dept.nameAr, descriptionEn: dept.descriptionEn || '', descriptionAr: dept.descriptionAr || '' })
+    setForm({ nameEn: dept.nameEn, nameAr: dept.nameAr })
     setEditingDept(dept); setShowForm(true); setError('')
   }
 
@@ -78,9 +78,6 @@ const DepartmentsPage = () => {
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1 text-center">{language === 'ar' ? dept.nameAr : dept.nameEn}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-3">{language === 'ar' ? dept.nameEn : dept.nameAr}</p>
-                {(language === 'ar' ? dept.descriptionAr : dept.descriptionEn) && (
-                  <p className="text-gray-600 dark:text-gray-400 text-center text-sm mb-4 line-clamp-2">{language === 'ar' ? dept.descriptionAr : dept.descriptionEn}</p>
-                )}
                 <div className="flex items-center justify-center text-sm text-gray-500 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <Users className="w-4 h-4 mr-1 rtl:ml-1 rtl:mr-0" /><span>{t('content.departments')}</span>
                 </div>
@@ -112,14 +109,6 @@ const DepartmentsPage = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('content.nameAr')}</label>
                 <input type="text" value={form.nameAr} onChange={(e) => setForm({ ...form, nameAr: e.target.value })} dir="rtl" className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none" required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('content.descriptionEn')}</label>
-                <textarea value={form.descriptionEn} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} rows={3} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('content.descriptionAr')}</label>
-                <textarea value={form.descriptionAr} onChange={(e) => setForm({ ...form, descriptionAr: e.target.value })} rows={3} dir="rtl" className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none" />
               </div>
               <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button type="button" onClick={resetForm} className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">{t('common.cancel')}</button>
