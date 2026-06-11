@@ -267,8 +267,8 @@ const SchedulesPage = () => {
                         </h4>
                         <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                           <div className="flex items-center">
-                            <Clock className="w-4 h-4 mr-2" />
-                            <span>{schedule.startTime} - {schedule.endTime}</span>
+                            <Clock className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                            <span>{schedule.startTime?.slice(0, 5)} - {schedule.endTime?.slice(0, 5)}</span>
                           </div>
                           <div className="flex items-center">
                             <User className="w-4 h-4 mr-2" />

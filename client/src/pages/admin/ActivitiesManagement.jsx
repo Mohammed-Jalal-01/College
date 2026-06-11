@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Edit, Trash2, X, Calendar } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Calendar, AlertCircle } from 'lucide-react';
 import { activitiesService } from '../../services/api/activitiesService';
 
 const ActivitiesManagement = () => {
@@ -9,6 +9,7 @@ const ActivitiesManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingActivity, setEditingActivity] = useState(null);
+  const [formError, setFormError] = useState('');
   const [formData, setFormData] = useState({
     titleEn: '',
     titleAr: '',
@@ -45,7 +46,13 @@ const ActivitiesManagement = () => {
       handleCloseModal();
     } catch (error) {
       console.error('Error saving activity:', error);
-      alert(error.response?.data?.message || t('common.error'));
+      const data = error.response?.data;
+      let msg = data?.message;
+      if (!msg && data?.errors) {
+        const firstKey = Object.keys(data.errors)[0];
+        msg = data.errors[firstKey]?.[0];
+      }
+      setFormError(msg || t('common.error'));
     }
   };
 
@@ -76,6 +83,7 @@ const ActivitiesManagement = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingActivity(null);
+    setFormError('');
     setFormData({
       titleEn: '',
       titleAr: '',
@@ -101,60 +109,62 @@ const ActivitiesManagement = () => {
         </h1>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
-          <Plus className="w-5 h-5 mr-2" />
+          <Plus className="w-5 h-5" />
           {t('content.addActivity')}
         </button>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-900/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                   {t('content.title')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                   {t('content.date')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                   {t('content.createdBy')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3.5 text-start text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                   {t('common.actions')}
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
               {activities.map((item) => (
-                <tr key={item.id}>
-                  <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
+                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                     {i18n.language === 'ar' ? item.titleAr : item.titleEn}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                     <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-2" />
+                      <Calendar className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0 text-gray-400" />
                       {new Date(item.date).toLocaleDateString()}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                     {item.createdByName}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                    <button
-                      onClick={() => handleEdit(item)}
-                      className="text-primary-600 hover:text-primary-900 dark:text-primary-400"
-                    >
-                      <Edit className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="text-red-600 hover:text-red-900 dark:text-red-400"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleEdit(item)}
+                        className="p-2 rounded-lg text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -176,6 +186,12 @@ const ActivitiesManagement = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              {formError && (
+                <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  {formError}
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('content.titleEn')}

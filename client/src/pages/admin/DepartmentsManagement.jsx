@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Edit, Trash2, X, AlertCircle } from 'lucide-react';
 import { departmentsService } from '../../services/api/departmentsService';
 
 const DepartmentsManagement = () => {
@@ -9,6 +9,7 @@ const DepartmentsManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState(null);
+  const [formError, setFormError] = useState('');
   const [formData, setFormData] = useState({
     nameEn: '',
     nameAr: '',
@@ -44,7 +45,13 @@ const DepartmentsManagement = () => {
       handleCloseModal();
     } catch (error) {
       console.error('Error saving department:', error);
-      alert(error.response?.data?.message || t('common.error'));
+      const data = error.response?.data;
+      let msg = data?.message;
+      if (!msg && data?.errors) {
+        const firstKey = Object.keys(data.errors)[0];
+        msg = data.errors[firstKey]?.[0];
+      }
+      setFormError(msg || t('common.error'));
     }
   };
 
@@ -74,6 +81,7 @@ const DepartmentsManagement = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingDepartment(null);
+    setFormError('');
     setFormData({
       nameEn: '',
       nameAr: '',
@@ -98,34 +106,34 @@ const DepartmentsManagement = () => {
         </h1>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
-          <Plus className="w-5 h-5 mr-2" />
+          <Plus className="w-5 h-5" />
           {t('content.addDepartment')}
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {departments.map((dept) => (
-          <div key={dept.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          <div key={dept.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {i18n.language === 'ar' ? dept.nameAr : dept.nameEn}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
               {i18n.language === 'ar' ? dept.descriptionAr : dept.descriptionEn}
             </p>
-            <div className="flex justify-end space-x-2">
+            <div className="flex justify-end gap-1">
               <button
                 onClick={() => handleEdit(dept)}
-                className="p-2 text-primary-600 hover:text-primary-900 dark:text-primary-400"
+                className="p-2 rounded-lg text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors"
               >
-                <Edit className="w-5 h-5" />
+                <Edit className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleDelete(dept.id)}
-                className="p-2 text-red-600 hover:text-red-900 dark:text-red-400"
+                className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
               >
-                <Trash2 className="w-5 h-5" />
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -145,6 +153,12 @@ const DepartmentsManagement = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              {formError && (
+                <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  {formError}
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('content.nameEn')}

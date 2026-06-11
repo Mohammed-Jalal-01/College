@@ -667,6 +667,49 @@ const HomePage = () => {
 
 ---
 
+## Admin Management Pages (Table and Card UI)
+
+**Files:**
+- `client/src/pages/admin/ActivitiesManagement.jsx`
+- `client/src/pages/admin/NewsManagement.jsx`
+- `client/src/pages/admin/MaterialsManagement.jsx`
+- `client/src/pages/admin/SchedulesManagement.jsx`
+- `client/src/pages/admin/DepartmentsManagement.jsx`
+
+**Table Improvements (Activities, News, Materials, Schedules):**
+- Container: `rounded-xl` with `border` and `shadow-sm` for clear boundaries in dark mode
+- Header: `bg-gray-50 dark:bg-gray-900/50` with `font-semibold` for stronger visual hierarchy
+- Header alignment: `text-start` (logical property) ensures correct alignment in both LTR and RTL
+- Rows: `hover:bg-gray-50 dark:hover:bg-gray-700/40` for interactive feedback
+- Body dividers: lighter `divide-gray-100 dark:divide-gray-700/50` to reduce visual noise
+- First column uses `font-medium` to emphasize the primary data field
+- Secondary columns use `text-gray-600 dark:text-gray-300` for clear hierarchy
+- Time display (Schedules): trimmed from HH:MM:SS to HH:MM via `.slice(0, 5)`
+
+**Action Buttons (all 5 pages):**
+- Replaced bare icon links with `p-2 rounded-lg` buttons with hover backgrounds
+- Edit: `hover:bg-primary-50 dark:hover:bg-primary-900/30`
+- Delete: `hover:bg-red-50 dark:hover:bg-red-900/30`
+- Download (Materials): `hover:bg-green-50 dark:hover:bg-green-900/30`
+
+**Card Improvements (Departments):**
+- Added `border border-gray-200 dark:border-gray-700` and `hover:shadow-md` transition
+- Consistent action button styling with table pages
+
+**Error Handling:**
+- Replaced `alert()` calls in `handleSubmit` with inline `formError` state across all 5 pages
+- Error display uses `AlertCircle` icon with red border styling, consistent with SchedulesManagement pattern
+- ASP.NET validation errors are extracted from `response.data.errors` when `message` is absent
+
+**RTL Alignment (all 5 pages):**
+- "Add" buttons use `gap-2` instead of `mr-2` on icons for direction-agnostic spacing
+- Icon margins in flex containers use `rtl:ml-2 rtl:mr-0` pattern where `gap` is not applicable
+
+**Bug Fix (MaterialsManagement):**
+- Replaced hardcoded `http://localhost:5000` download URL with `import.meta.env.VITE_API_BASE_URL`
+
+---
+
 ## Future Enhancements
 
 - Implement React Query for server state
